@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PRESIDENT
+  VICE_PRESIDENT
+  SECRETARY
+  TESKILAT_BASKANI
+  SOSYAL_MEDYA_SORUMLUSU
+  KOMISYON_SOSYAL_MEDYA
+  KOMISYON_TESKILAT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(KOMISYON_SOSYAL_MEDYA)
+  mustChangePassword Boolean @default(true)
+  resetCode String?
+  resetCodeExpires DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model News {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  imageUrl  String?
+  authorId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id            String   @id @default(uuid())
+  title         String
+  description   String
+  location      String?
+  eventDate     DateTime
+  imageUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  registrations EventRegistration[]
+}
+
+model EventRegistration {
+  id        String   @id @default(uuid())
+  eventId   String
+  name      String
+  phone     String
+  email     String
+  createdAt DateTime @default(now())
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  status      String   @default("PLANNED") // PLANNED, ONGOING, COMPLETED
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Gallery {
+  id          String   @id @default(uuid())
+  title       String?
+  imageUrl    String   // This will act as the Cover Image
+  date        DateTime @default(now())
+  images      GalleryImage[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GalleryImage {
+  id          String   @id @default(uuid())
+  galleryId   String
+  imageUrl    String
+  createdAt   DateTime @default(now())
+  
+  gallery     Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+}
+
+model MembershipApplication {
+  id                  String   @id @default(uuid())
+  name                String
+  email               String
+  phone               String
+  message             String
+  birthDate           String
+  livesInKayseri      String
+  education           String
+  ideology            String
+  politicalParty      String
+  definitionTurkculuk String
+  turanMeaning        String
+  reasonToJoin        String
+  favoriteLeader      String
+  status              String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
