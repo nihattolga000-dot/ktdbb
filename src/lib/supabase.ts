@@ -13,7 +13,7 @@ export const uploadToSupabase = async (file: File, bucket: string = 'tdb-gallery
   const fileExt = file.name.split('.').pop();
   const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${fileExt}`;
   
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from(bucket)
     .upload(fileName, file, {
       cacheControl: '3600',
