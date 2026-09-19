@@ -42,14 +42,14 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret-key-change-this-in-producti
 app.use(cors());
 app.use(express.json());
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
-
 // Serve static files from uploads (only works locally)
-app.use('/uploads', express.static(uploadsDir));
+if (process.env.VERCEL !== '1') {
+  const uploadsDir = path.join(process.cwd(), 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+  }
+  app.use('/uploads', express.static(uploadsDir));
+}
 
 // Multer storage config (Use memory storage for Vercel & Supabase)
 const storage = multer.memoryStorage();
