@@ -34,7 +34,7 @@ export default function NewsManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/news', {
+      const res = await fetch('/api/news', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -63,7 +63,7 @@ export default function NewsManagement() {
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        const uploadRes = await fetch('http://localhost:5000/api/upload', {
+        const uploadRes = await fetch('/api/upload', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -76,8 +76,8 @@ export default function NewsManagement() {
       }
 
       const url = editingId 
-        ? `http://localhost:5000/api/news/${editingId}` 
-        : 'http://localhost:5000/api/news';
+        ? `/api/news/${editingId}` 
+        : '/api/news';
         
       const res = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
@@ -126,7 +126,7 @@ export default function NewsManagement() {
     if (!window.confirm('Bu haberi silmek istediğinize emin misiniz?')) return;
     
     try {
-      const res = await fetch(`http://localhost:5000/api/news/${id}`, {
+      const res = await fetch(`/api/news/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

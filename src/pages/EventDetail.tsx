@@ -15,7 +15,7 @@ export default function EventDetail() {
   const [formMessage, setFormMessage] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/events/${id}`)
+    fetch(`/api/events/${id}`)
       .then(r => r.json())
       .then(d => { setEvent(d); setLoading(false); })
       .catch(() => setLoading(false));
@@ -25,7 +25,7 @@ export default function EventDetail() {
     e.preventDefault();
     setFormStatus("submitting");
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}/register`, {
+      const res = await fetch(`/api/events/${id}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, email }),

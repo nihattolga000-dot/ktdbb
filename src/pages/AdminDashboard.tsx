@@ -1,4 +1,4 @@
-﻿import { FileText, Image as ImageIcon, Calendar, Briefcase, Users, Activity } from 'lucide-react';
+import { FileText, Image as ImageIcon, Calendar, Briefcase, Users, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function AdminDashboard() {
@@ -9,10 +9,10 @@ export default function AdminDashboard() {
       {/* Header Area */}
       <div>
         <h1 className="font-display text-4xl lg:text-5xl font-bold text-white mb-3 uppercase tracking-tight">
-          Yönetim Paneli
+          Y�netim Paneli
         </h1>
         <p className="text-neutral-400 text-lg max-w-2xl leading-relaxed">
-          Sisteme hoş geldin, <strong className="text-white">{user?.name}</strong>. Sol menüden yetkili olduğun sekmeleri seçerek içerik güncellemelerini hızlıca yapabilirsin.
+          Sisteme ho� geldin, <strong className="text-white">{user?.name}</strong>. Sol men�den yetkili oldu�un sekmeleri se�erek i�erik g�ncellemelerini h�zl�ca yapabilirsin.
         </p>
       </div>
 
@@ -22,7 +22,7 @@ export default function AdminDashboard() {
         <DashboardCard 
           title="Galeri Durumu" 
           count="12" 
-          label="Fotoğraf" 
+          label="Foto�raf" 
           icon={<ImageIcon size={28} className="text-[#cc1616]" />} 
           accentColor="#cc1616"
         />
@@ -30,7 +30,7 @@ export default function AdminDashboard() {
         <DashboardCard 
           title="Aktif Haberler" 
           count="8" 
-          label="Yayınlanan" 
+          label="Yay�nlanan" 
           icon={<FileText size={28} className="text-[#cc1616]" />} 
           accentColor="#cc1616"
         />
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
         <DashboardCard 
           title="Etkinlikler" 
           count="3" 
-          label="Yaklaşan" 
+          label="Yakla�an" 
           icon={<Calendar size={28} className="text-neutral-300" />} 
           accentColor="#555555"
         />
@@ -53,9 +53,9 @@ export default function AdminDashboard() {
 
         {user?.role === 'PRESIDENT' && (
           <DashboardCard 
-            title="Kayıtlı Üyeler" 
+            title="Kay�tl� �yeler" 
             count="24" 
-            label="Aktif Üye" 
+            label="Aktif �ye" 
             icon={<Users size={28} className="text-blue-500" />} 
             accentColor="#3b82f6"
           />

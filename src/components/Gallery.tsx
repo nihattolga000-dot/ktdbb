@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ZoomIn, Eye, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 
 interface GalleryProps {
   isStandalone?: boolean;
@@ -26,7 +26,7 @@ export default function Gallery({ isStandalone = false }: GalleryProps) {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/gallery')
+    fetch('/api/gallery')
       .then(res => res.json())
       .then(data => setGalleryItems(data))
       .catch(err => console.error('Galeri çekilemedi', err));

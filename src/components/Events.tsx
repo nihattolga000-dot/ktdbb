@@ -6,7 +6,7 @@ export default function Events() {
   const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/events')
+    fetch('/api/events')
       .then(res => res.json())
       .then(data => setEvents(data))
       .catch(err => console.error('Etkinlikler çekilemedi', err));

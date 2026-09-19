@@ -50,7 +50,7 @@ export default function EventsManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/events', {
+      const res = await fetch('/api/events', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -69,7 +69,7 @@ export default function EventsManagement() {
     setLoadingRegistrations(true);
     setRegistrations([]);
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}/registrations`, {
+      const res = await fetch(`/api/events/${id}/registrations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -97,7 +97,7 @@ export default function EventsManagement() {
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        const uploadRes = await fetch('http://localhost:5000/api/upload', {
+        const uploadRes = await fetch('/api/upload', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -107,7 +107,7 @@ export default function EventsManagement() {
         finalImageUrl = uploadData.imageUrl;
       }
 
-      const url = editingId ? `http://localhost:5000/api/events/${editingId}` : 'http://localhost:5000/api/events';
+      const url = editingId ? `/api/events/${editingId}` : '/api/events';
       const res = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
         headers: {
@@ -158,7 +158,7 @@ export default function EventsManagement() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const res = await fetch(`/api/events/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

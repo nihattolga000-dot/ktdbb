@@ -38,7 +38,7 @@ export default function GalleryManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/gallery', {
+      const res = await fetch('/api/gallery', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -67,7 +67,7 @@ export default function GalleryManagement() {
         const formData = new FormData();
         imageFiles.forEach(file => formData.append('images', file));
         
-        const uploadRes = await fetch('http://localhost:5000/api/upload/multiple', {
+        const uploadRes = await fetch('/api/upload/multiple', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -77,7 +77,7 @@ export default function GalleryManagement() {
         finalImageUrls = uploadData.imageUrls;
       }
 
-      const url = editingId ? `http://localhost:5000/api/gallery/${editingId}` : 'http://localhost:5000/api/gallery';
+      const url = editingId ? `/api/gallery/${editingId}` : '/api/gallery';
       const res = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
         headers: {
@@ -124,7 +124,7 @@ export default function GalleryManagement() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Bu görseli silmek istediğinize emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/gallery/${id}`, {
+      const res = await fetch(`/api/gallery/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

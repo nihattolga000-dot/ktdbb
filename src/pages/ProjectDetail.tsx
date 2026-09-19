@@ -16,7 +16,7 @@ export default function ProjectDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/projects/${id}`)
+    fetch(`/api/projects/${id}`)
       .then(r => r.json())
       .then(d => { setProject(d); setLoading(false); })
       .catch(() => setLoading(false));

@@ -9,7 +9,7 @@ export default function ChangePassword() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const { token, login, user } = useAuth();
+  const { token, login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,7 +30,7 @@ export default function ChangePassword() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/change-password', {
+      const res = await fetch('/api/auth/change-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

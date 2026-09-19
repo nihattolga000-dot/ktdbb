@@ -13,7 +13,7 @@ export default function ApplicationsManagement() {
 
   const fetchApps = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/applications', {
+      const res = await fetch('/api/applications', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -39,7 +39,7 @@ export default function ApplicationsManagement() {
     setSuccess('');
 
     try {
-      const res = await fetch(`http://localhost:5000/api/applications/${id}/approve`, {
+      const res = await fetch(`/api/applications/${id}/approve`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -61,7 +61,7 @@ export default function ApplicationsManagement() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Bu başvuruyu reddedip/silmek istediğinize emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/applications/${id}`, {
+      const res = await fetch(`/api/applications/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

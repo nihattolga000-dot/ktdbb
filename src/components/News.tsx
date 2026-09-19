@@ -6,7 +6,7 @@ export default function News() {
   const [newsItems, setNewsItems] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/news')
+    fetch('/api/news')
       .then(res => res.json())
       .then(data => setNewsItems(data))
       .catch(err => console.error('Haberler çekilemedi', err));

@@ -10,7 +10,7 @@ export default function NewsDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/news/${id}`)
+    fetch(`/api/news/${id}`)
       .then(r => r.json())
       .then(d => { setNews(d); setLoading(false); })
       .catch(() => setLoading(false));

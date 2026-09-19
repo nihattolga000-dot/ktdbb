@@ -36,7 +36,7 @@ export default function ProjectsManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/projects', {
+      const res = await fetch('/api/projects', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -64,7 +64,7 @@ export default function ProjectsManagement() {
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        const uploadRes = await fetch('http://localhost:5000/api/upload', {
+        const uploadRes = await fetch('/api/upload', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -74,7 +74,7 @@ export default function ProjectsManagement() {
         finalImageUrl = uploadData.imageUrl;
       }
 
-      const url = editingId ? `http://localhost:5000/api/projects/${editingId}` : 'http://localhost:5000/api/projects';
+      const url = editingId ? `/api/projects/${editingId}` : '/api/projects';
       const res = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
         headers: {
@@ -119,7 +119,7 @@ export default function ProjectsManagement() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Projeyi silmek istediğinize emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${id}`, {
+      const res = await fetch(`/api/projects/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

@@ -20,7 +20,7 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/users', {
+      const res = await fetch('/api/users', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -47,8 +47,8 @@ export default function UserManagement() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/users/${editingId}` 
-        : 'http://localhost:5000/api/users';
+        ? `/api/users/${editingId}` 
+        : '/api/users';
         
       const body = editingId 
         ? JSON.stringify({ name, email }) 
@@ -96,7 +96,7 @@ export default function UserManagement() {
   const handleDeleteUser = async (id: string) => {
     if (!window.confirm('Bu üyeyi silmek istediğinize emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const res = await fetch(`/api/users/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -110,7 +110,7 @@ export default function UserManagement() {
 
   const handleRoleChange = async (id: string, newRole: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}/role`, {
+      const res = await fetch(`/api/users/${id}/role`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

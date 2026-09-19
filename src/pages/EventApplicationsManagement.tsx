@@ -30,7 +30,7 @@ export default function EventApplicationsManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/event-registrations', {
+      const res = await fetch('/api/event-registrations', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
