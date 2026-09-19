@@ -320,70 +320,7 @@ app.put('/api/users/:id', authenticate, requireAdmin, async (req, res) => {
   }
 });
 
-// --- Upload Management (Supabase Storage) ---
-app.post('/api/upload', authenticate, upload.single('image'), async (req: any, res: any) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'Dosya yüklenmedi' });
-  }
-
-  try {
-    const file = req.file;
-    const fileExt = file.originalname.split('.').pop();
-    const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { data, error } = await supabase.storage
-      .from('tdb-gallery')
-      .upload(filePath, file.buffer, {
-        contentType: file.mimetype,
-        upsert: false
-      });
-
-    if (error) throw error;
-
-    const { data: publicUrlData } = supabase.storage.from('tdb-gallery').getPublicUrl(filePath);
-    const imageUrl = publicUrlData.publicUrl;
-
-    res.json({ imageUrl });
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: 'Görsel yüklenemedi. Supabase ayarlarını kontrol edin.' });
-  }
-});
-
-app.post('/api/upload/multiple', authenticate, upload.array('images', 50), async (req: any, res: any) => {
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ error: 'Dosya yüklenmedi' });
-  }
-
-  try {
-    const imageUrls: string[] = [];
-
-    for (const file of req.files) {
-      const fileExt = file.originalname.split('.').pop();
-      const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { data, error } = await supabase.storage
-        .from('tdb-gallery')
-        .upload(filePath, file.buffer, {
-          contentType: file.mimetype,
-          upsert: false
-        });
-
-      if (error) throw error;
-
-      const { data: publicUrlData } = supabase.storage.from('tdb-gallery').getPublicUrl(filePath);
-      imageUrls.push(publicUrlData.publicUrl);
-    }
-
-    res.json({ imageUrls });
-  } catch (error) {
-    console.error('Multiple upload error:', error);
-    res.status(500).json({ error: 'Görseller yüklenemedi. Supabase ayarlarını kontrol edin.' });
-  }
-});
-
+// --- Upload Management is now handled directly by the frontend to bypass Vercel limits ---
 // --- News Management (Social Media Comm) ---
 app.get('/api/news', async (req, res) => {
   try {

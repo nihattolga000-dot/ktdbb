@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Plus, Image as ImageIcon, Loader2, Edit2, X } from 'lucide-react';
+import { uploadToSupabase } from '../lib/supabase';
 
 interface GalleryImage {
   id: string;
@@ -64,17 +65,8 @@ export default function GalleryManagement() {
     try {
       let finalImageUrls: string[] = [];
       if (imageFiles.length > 0) {
-        const formData = new FormData();
-        imageFiles.forEach(file => formData.append('images', file));
-        
-        const uploadRes = await fetch('/api/upload/multiple', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData
-        });
-        if (!uploadRes.ok) throw new Error('Görseller yüklenirken hata oluştu.');
-        const uploadData = await uploadRes.json();
-        finalImageUrls = uploadData.imageUrls;
+        const uploadPromises = imageFiles.map(file => uploadToSupabase(file, 'tdb-gallery'));
+        finalImageUrls = await Promise.all(uploadPromises);
       }
 
       const url = editingId ? `/api/gallery/${editingId}` : '/api/gallery';

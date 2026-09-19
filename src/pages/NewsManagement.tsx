@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Plus, FileText, Loader2, Edit2, X, Image as ImageIcon, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { uploadToSupabase } from '../lib/supabase';
 
 interface NewsItem {
   id: string;
@@ -61,18 +62,7 @@ export default function NewsManagement() {
     try {
       let finalImageUrl = null;
       if (imageFile) {
-        const formData = new FormData();
-        formData.append('image', imageFile);
-        const uploadRes = await fetch('/api/upload', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData
-        });
-        if (!uploadRes.ok) {
-          throw new Error('Görsel yüklenirken hata oluştu.');
-        }
-        const uploadData = await uploadRes.json();
-        finalImageUrl = uploadData.imageUrl;
+        finalImageUrl = await uploadToSupabase(imageFile, 'tdb-gallery');
       }
 
       const url = editingId 
