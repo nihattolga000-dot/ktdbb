@@ -1,13 +1,4 @@
-import { BookOpen, Users, Globe, Handshake, GraduationCap, Landmark } from 'lucide-react';
-
-const themes = [
-  { icon: Landmark, label: 'Kültürel Miras', desc: 'Ortak tarih' },
-  { icon: Handshake, label: 'Dayanışma', desc: 'İş birliği' },
-  { icon: Users, label: 'Gençlik', desc: 'Bilinçlendirme' },
-  { icon: GraduationCap, label: 'Eğitim', desc: 'Bilgi transferi' },
-  { icon: BookOpen, label: 'Ortak Değerler', desc: 'Paylaşılan miras' },
-  { icon: Globe, label: 'İş Birliği', desc: 'Sivil toplum ağı' },
-];
+import { Globe, Landmark } from 'lucide-react';
 
 const mapPoints = [
   { label: 'İstanbul', x: 25, y: 40 },

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ZoomIn, Eye } from 'lucide-react';
+import { X, Eye } from 'lucide-react';
 
 interface GalleryProps {
   isStandalone?: boolean;

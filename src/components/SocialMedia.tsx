@@ -23,7 +23,7 @@ const socials = [
   },
   {
     name: 'X (Twitter)',
-    handle: '@tdbkayseri',
+    handle: '@tdbkayserii',
     Icon: XIcon,
     href: socialConfig.twitter,
   },
@@ -59,7 +59,7 @@ export default function SocialMedia() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 max-w-xl mx-auto gap-4">
           {socials.map(({ name, handle, Icon, href }) => (
             <a
               key={name}

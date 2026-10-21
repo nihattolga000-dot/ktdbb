@@ -23,7 +23,7 @@ export const contactConfig = {
 
 export const socialConfig = {
   instagram: 'https://www.instagram.com/tdb.kayserii/',
-  twitter: 'https://x.com/tdbkayseri',
+  twitter: 'https://x.com/tdbkayserii?s=11',
 } as const;
 
 // İstatistikler — kolayca güncellenebilir
