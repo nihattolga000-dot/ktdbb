@@ -31,7 +31,15 @@ const prisma = new PrismaClient({ adapter });
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret-key-change-this-in-production';
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://kayseritdb.com.tr',
+    'https://www.kayseritdb.com.tr',
+    'http://localhost:5173',
+    'http://localhost:4173',
+  ],
+  credentials: true,
+}));
 app.use(express.json());
 
 // Ensure uploads directory exists
