@@ -82,17 +82,31 @@ export default function Contact() {
     if (!validate()) return;
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
       const res = await fetch(`${API_BASE_URL}/api/applications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
+        signal: controller.signal,
       });
-      if (!res.ok) throw new Error('Sunucu hatası');
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Sunucu hatası (${res.status})`);
+      }
       setSubmitted(true);
       setForm(initialForm);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      alert('Mesajınız gönderilirken bir hata oluştu.');
+      if (err instanceof Error && err.name === 'AbortError') {
+        alert('Sunucu yanıt vermedi. Lütfen birkaç saniye bekleyip tekrar deneyin.');
+      } else {
+        const msg = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
+        alert(`Mesajınız gönderilemedi: ${msg}`);
+      }
     } finally {
       setLoading(false);
     }
