@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Calendar } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { API_BASE_URL } from "../data/config";
 
 export default function NewsDetail() {
   const { id } = useParams();
@@ -10,7 +11,7 @@ export default function NewsDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/news/${id}`)
+    fetch(`${API_BASE_URL}/api/news/${id}`)
       .then(r => r.json())
       .then(d => { setNews(d); setLoading(false); })
       .catch(() => setLoading(false));

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Plus, Image as ImageIcon, Loader2, Edit2, X } from 'lucide-react';
+import { API_BASE_URL } from '../data/config';
 
 interface GalleryItem {
   id: string;
@@ -30,7 +31,7 @@ export default function GalleryManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/gallery', {
+      const res = await fetch(`${API_BASE_URL}/api/gallery`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -58,7 +59,7 @@ export default function GalleryManagement() {
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        const uploadRes = await fetch('http://localhost:5000/api/upload', {
+        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -68,7 +69,7 @@ export default function GalleryManagement() {
         finalImageUrl = uploadData.imageUrl;
       }
 
-      const url = editingId ? `http://localhost:5000/api/gallery/${editingId}` : 'http://localhost:5000/api/gallery';
+      const url = editingId ? `${API_BASE_URL}/api/gallery/${editingId}` : `${API_BASE_URL}/api/gallery`;
       const res = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
         headers: {
@@ -112,7 +113,7 @@ export default function GalleryManagement() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Bu görseli silmek istediğinize emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/gallery/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/gallery/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

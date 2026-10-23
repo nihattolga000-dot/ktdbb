@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Plus, Calendar, Loader2, Edit2, X, Image as ImageIcon, Eye, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../data/config';
 
 interface EventItem {
   id: string;
@@ -50,7 +51,7 @@ export default function EventsManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/events', {
+      const res = await fetch(`${API_BASE_URL}/api/events`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -69,7 +70,7 @@ export default function EventsManagement() {
     setLoadingRegistrations(true);
     setRegistrations([]);
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}/registrations`, {
+      const res = await fetch(`${API_BASE_URL}/api/events/${id}/registrations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -97,7 +98,7 @@ export default function EventsManagement() {
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        const uploadRes = await fetch('http://localhost:5000/api/upload', {
+        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -107,7 +108,7 @@ export default function EventsManagement() {
         finalImageUrl = uploadData.imageUrl;
       }
 
-      const url = editingId ? `http://localhost:5000/api/events/${editingId}` : 'http://localhost:5000/api/events';
+      const url = editingId ? `${API_BASE_URL}/api/events/${editingId}` : `${API_BASE_URL}/api/events`;
       const res = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
         headers: {
@@ -158,7 +159,7 @@ export default function EventsManagement() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/events/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

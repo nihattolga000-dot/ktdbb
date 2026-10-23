@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { CheckCircle, Trash2, Mail, Users, Eye, X, Loader2, Mailbox } from 'lucide-react';
+import { API_BASE_URL } from '../data/config';
 
 export default function ApplicationsManagement() {
   const { token } = useAuth();
@@ -13,7 +14,7 @@ export default function ApplicationsManagement() {
 
   const fetchApps = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/applications', {
+      const res = await fetch(`${API_BASE_URL}/api/applications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -39,7 +40,7 @@ export default function ApplicationsManagement() {
     setSuccess('');
 
     try {
-      const res = await fetch(`http://localhost:5000/api/applications/${id}/approve`, {
+      const res = await fetch(`${API_BASE_URL}/api/applications/${id}/approve`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -61,7 +62,7 @@ export default function ApplicationsManagement() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Bu başvuruyu reddedip/silmek istediğinize emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/applications/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/applications/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

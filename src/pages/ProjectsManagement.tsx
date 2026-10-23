@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Plus, Briefcase, Loader2, Edit2, X, Image as ImageIcon, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../data/config';
 
 interface ProjectItem {
   id: string;
@@ -36,7 +37,7 @@ export default function ProjectsManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/projects', {
+      const res = await fetch(`${API_BASE_URL}/api/projects`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -64,7 +65,7 @@ export default function ProjectsManagement() {
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
-        const uploadRes = await fetch('http://localhost:5000/api/upload', {
+        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -74,7 +75,7 @@ export default function ProjectsManagement() {
         finalImageUrl = uploadData.imageUrl;
       }
 
-      const url = editingId ? `http://localhost:5000/api/projects/${editingId}` : 'http://localhost:5000/api/projects';
+      const url = editingId ? `${API_BASE_URL}/api/projects/${editingId}` : `${API_BASE_URL}/api/projects`;
       const res = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
         headers: {
@@ -119,7 +120,7 @@ export default function ProjectsManagement() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Projeyi silmek istediğinize emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/projects/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

@@ -1,12 +1,13 @@
 import { ArrowRight, Tag } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../data/config';
 
 export default function Projects() {
   const [projects, setProjects] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/projects')
+    fetch(`${API_BASE_URL}/api/projects`)
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error('Projeler çekilemedi', err));

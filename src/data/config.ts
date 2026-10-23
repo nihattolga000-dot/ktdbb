@@ -4,6 +4,15 @@
 // kolayca güncelleyebilirsiniz.
 // ============================================================
 
+/**
+ * API sunucusunun base URL'i.
+ * - Geliştirme: .env.local dosyasında VITE_API_URL=http://localhost:5000
+ * - Canlı sunucu: .env.production dosyasında VITE_API_URL=https://kayseritdb.com.tr
+ *   (veya boş bırakırsanız aynı origin'den /api/... olarak istek atar)
+ */
+export const API_BASE_URL: string =
+  import.meta.env.VITE_API_URL ?? '';
+
 export const siteConfig = {
   name: 'Kayseri Turancı Dernekler Birliği',
   shortName: 'KTDB',
@@ -11,7 +20,7 @@ export const siteConfig = {
   city: 'Kayseri',
   description:
     'Kayseri Turancı Dernekler Birliği; Türk dünyası arasındaki kültürel, sosyal ve gönüllü bağları güçlendirmek, ortak değerleri yaşatmak ve gelecek nesillere aktarmak amacıyla Kayseri\'de çalışmalar yürütür.',
-  url: 'https://kayserituranci.org',
+  url: 'https://kayseritdb.com.tr',
 } as const;
 
 export const contactConfig = {

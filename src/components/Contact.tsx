@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { MapPin, Phone, Mail, CheckCircle, ArrowRight } from 'lucide-react';
-import { contactConfig } from '../data/config';
+import { contactConfig, API_BASE_URL } from '../data/config';
 
 interface FormState {
   name: string;
@@ -82,7 +82,7 @@ export default function Contact() {
     if (!validate()) return;
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/applications', {
+      const res = await fetch(`${API_BASE_URL}/api/applications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)

@@ -1,12 +1,13 @@
 import { Calendar, Tag, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../data/config';
 
 export default function News() {
   const [newsItems, setNewsItems] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/news')
+    fetch(`${API_BASE_URL}/api/news`)
       .then(res => res.json())
       .then(data => setNewsItems(data))
       .catch(err => console.error('Haberler çekilemedi', err));

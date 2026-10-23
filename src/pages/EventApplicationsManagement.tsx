@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, Users, Calendar } from 'lucide-react';
+import { API_BASE_URL } from '../data/config';
 
 interface EventRegistration {
   id: string;
@@ -30,7 +31,7 @@ export default function EventApplicationsManagement() {
 
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/event-registrations', {
+      const res = await fetch(`${API_BASE_URL}/api/event-registrations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {

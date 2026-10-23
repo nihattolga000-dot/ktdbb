@@ -1,12 +1,13 @@
 import { MapPin, Clock, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../data/config';
 
 export default function Events() {
   const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/events')
+    fetch(`${API_BASE_URL}/api/events`)
       .then(res => res.json())
       .then(data => setEvents(data))
       .catch(err => console.error('Etkinlikler çekilemedi', err));

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { UserPlus, Trash2, Users, Shield, RefreshCw, Edit2, X, Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '../data/config';
 
 export default function UserManagement() {
   const { token, user } = useAuth();
@@ -20,7 +21,7 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/users', {
+      const res = await fetch(`${API_BASE_URL}/api/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -47,8 +48,8 @@ export default function UserManagement() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/users/${editingId}` 
-        : 'http://localhost:5000/api/users';
+        ? `${API_BASE_URL}/api/users/${editingId}` 
+        : `${API_BASE_URL}/api/users`;
         
       const body = editingId 
         ? JSON.stringify({ name, email }) 
@@ -96,7 +97,7 @@ export default function UserManagement() {
   const handleDeleteUser = async (id: string) => {
     if (!window.confirm('Bu üyeyi silmek istediğinize emin misiniz?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -110,7 +111,7 @@ export default function UserManagement() {
 
   const handleRoleChange = async (id: string, newRole: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}/role`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/${id}/role`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

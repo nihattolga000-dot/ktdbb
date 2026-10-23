@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Calendar, Activity } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { API_BASE_URL } from "../data/config";
 
 function getStatus(s:string){
   if(s==="ONGOING")   return {label:"Devam Ediyor",color:"#22c55e",bg:"#22c55e15",border:"#22c55e30"};
@@ -16,7 +17,7 @@ export default function ProjectDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/projects/${id}`)
+    fetch(`${API_BASE_URL}/api/projects/${id}`)
       .then(r => r.json())
       .then(d => { setProject(d); setLoading(false); })
       .catch(() => setLoading(false));

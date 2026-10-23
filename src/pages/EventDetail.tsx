@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Clock, MapPin, ArrowLeft, Calendar, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { API_BASE_URL } from "../data/config";
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -15,7 +16,7 @@ export default function EventDetail() {
   const [formMessage, setFormMessage] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/events/${id}`)
+    fetch(`${API_BASE_URL}/api/events/${id}`)
       .then(r => r.json())
       .then(d => { setEvent(d); setLoading(false); })
       .catch(() => setLoading(false));
@@ -25,7 +26,7 @@ export default function EventDetail() {
     e.preventDefault();
     setFormStatus("submitting");
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}/register`, {
+      const res = await fetch(`${API_BASE_URL}/api/events/${id}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, email }),
