@@ -67,7 +67,8 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ────────────────────────────────────────────────────────────────────
 // Middlewares
@@ -199,6 +200,22 @@ router.put('/users/:id', authenticate, requireAdmin, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Kullanıcı güncellenemedi' });
+  }
+});
+
+// ────────────────────────────────────────────────────────────────────
+// Upload
+// ────────────────────────────────────────────────────────────────────
+router.post('/upload', authenticate, async (req: any, res: any) => {
+  try {
+    const { image } = req.body;
+    if (!image) {
+      return res.status(400).json({ error: 'Görsel verisi bulunamadı.' });
+    }
+    return res.json({ imageUrl: image });
+  } catch (error) {
+    console.error('Upload error:', error);
+    return res.status(500).json({ error: 'Görsel yüklenirken hata oluştu.' });
   }
 });
 

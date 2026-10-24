@@ -1,8 +1,9 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Plus, Briefcase, Loader2, Edit2, X, Image as ImageIcon, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { API_BASE_URL } from '../data/config';
+import { compressImage } from '../utils/imageCompressor';
 
 interface ProjectItem {
   id: string;
@@ -24,6 +25,8 @@ export default function ProjectsManagement() {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<'PLANNING' | 'ONGOING' | 'COMPLETED'>('PLANNING');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -51,6 +54,19 @@ export default function ProjectsManagement() {
     }
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setError('');
+      const compressed = await compressImage(file);
+      setImageFile(file);
+      setImagePreview(compressed);
+    } catch (err: any) {
+      setError(err.message || 'Görsel işlenirken bir hata oluştu');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !description) {
@@ -61,14 +77,15 @@ export default function ProjectsManagement() {
     setError('');
     
     try {
-      let finalImageUrl = null;
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append('image', imageFile);
+      let finalImageUrl = existingImageUrl;
+      if (imagePreview) {
         const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ image: imagePreview })
         });
         if (!uploadRes.ok) throw new Error('Görsel yüklenemedi');
         const uploadData = await uploadRes.json();
@@ -105,6 +122,8 @@ export default function ProjectsManagement() {
     setDescription(item.description);
     setStatus(item.status);
     setImageFile(null);
+    setImagePreview(null);
+    setExistingImageUrl(item.imageUrl || null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -114,6 +133,8 @@ export default function ProjectsManagement() {
     setDescription('');
     setStatus('PLANNING');
     setImageFile(null);
+    setImagePreview(null);
+    setExistingImageUrl(null);
     setError('');
   };
 
@@ -192,15 +213,48 @@ export default function ProjectsManagement() {
 
             <div>
               <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Proje Kapak Görseli</label>
-              <div className="relative group w-full md:w-1/2">
-                <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                />
-                <div className="w-full bg-[#050505] border border-dashed border-neutral-700 rounded-xl p-6 flex flex-col items-center justify-center text-neutral-500 group-hover:border-[#cc1616] group-hover:text-[#cc1616] transition-colors">
-                  <ImageIcon size={32} className="mb-2 opacity-50" />
-                  <span className="text-sm font-medium text-center">{imageFile ? imageFile.name : 'Görsel yüklemek için tıkla'}</span>
+              {(imagePreview || existingImageUrl) ? (
+                <div className="relative rounded-xl overflow-hidden border border-neutral-800 bg-[#050505] p-3 flex items-center gap-4 max-w-xl">
+                  <img 
+                    src={imagePreview || existingImageUrl || ''} 
+                    alt="Önizleme" 
+                    className="w-24 h-24 object-cover rounded-lg border border-neutral-700 shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">
+                      {imageFile ? imageFile.name : 'Mevcut Görsel'}
+                    </p>
+                    <p className="text-xs text-neutral-400 mt-1">
+                      {imagePreview ? 'Yeni görsel seçildi ve optimize edildi.' : 'Değiştirmek istemiyorsanız bu görsel korunur.'}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                        setExistingImageUrl(null);
+                      }}
+                      className="mt-2 text-xs font-bold text-red-500 hover:text-red-400 uppercase tracking-wider flex items-center gap-1 transition-colors"
+                    >
+                      <X size={14} /> Görseli Kaldır
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="relative group w-full md:w-1/2">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="w-full bg-[#050505] border border-dashed border-neutral-700 rounded-xl p-6 flex flex-col items-center justify-center text-neutral-500 group-hover:border-[#cc1616] group-hover:text-[#cc1616] transition-colors">
+                    <ImageIcon size={32} className="mb-2 opacity-50" />
+                    <span className="text-sm font-medium text-center">Görsel seçmek veya sürüklemek için tıklayın</span>
+                    <span className="text-xs text-neutral-500 mt-1">JPG, PNG, WebP (Otomatik optimize edilir)</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-3 pt-4 border-t border-neutral-800/50">
