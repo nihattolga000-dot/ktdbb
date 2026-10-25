@@ -246,16 +246,16 @@ export default function ProjectsManagement() {
                       )}
                     </div>
                     {/* Actions overlay */}
-                    <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                      <Link to={`/proje/${item.id}`} target="_blank" className="bg-neutral-800/80 hover:bg-neutral-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Görüntüle">
+                    <div className="absolute top-2.5 right-2.5 flex gap-1.5 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 translate-y-0 sm:translate-y-2 sm:group-hover:translate-y-0">
+                      <Link to={`/proje/${item.id}`} target="_blank" className="bg-neutral-900/90 hover:bg-neutral-800 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md border border-white/10 active:scale-95" title="Görüntüle">
                         <Eye size={16} />
                       </Link>
                       {canManage && (
                         <>
-                          <button onClick={() => handleEdit(item)} className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Düzenle">
+                          <button onClick={() => handleEdit(item)} className="bg-blue-600/90 hover:bg-blue-600 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md active:scale-95" title="Düzenle">
                             <Edit2 size={16} />
                           </button>
-                          <button onClick={() => handleDelete(item.id)} className="bg-[#cc1616] hover:bg-red-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Sil">
+                          <button onClick={() => handleDelete(item.id)} className="bg-[#cc1616]/90 hover:bg-red-700 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md active:scale-95" title="Sil">
                             <Trash2 size={16} />
                           </button>
                         </>

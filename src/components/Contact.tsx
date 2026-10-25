@@ -241,7 +241,7 @@ export default function Contact() {
               background: 'linear-gradient(145deg, color-mix(in srgb, var(--color-bg-card) 95%, transparent) 0%, color-mix(in srgb, var(--color-bg-primary) 98%, transparent) 100%)',
               border: '1px solid var(--color-border)',
               borderRadius: '16px',
-              padding: '3rem',
+              padding: 'clamp(1.25rem, 4vw, 3rem)',
               backdropFilter: 'blur(20px)',
               boxShadow: '0 25px 50px -12px color-mix(in srgb, var(--color-bg-primary) 50%, transparent)',
             }}

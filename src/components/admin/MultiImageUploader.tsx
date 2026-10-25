@@ -114,7 +114,7 @@ export default function MultiImageUploader({
               />
 
               {/* Karartma katmanı */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-black/40 opacity-20 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity pointer-events-none" />
 
               {/* Kapak Rozeti */}
               {isCover ? (
@@ -126,7 +126,7 @@ export default function MultiImageUploader({
                 <button
                   type="button"
                   onClick={() => handleSetCover(idx)}
-                  className="absolute top-1.5 left-1.5 p-1 rounded-md bg-black/70 hover:bg-[#cc1616] text-white/80 hover:text-white text-[10px] opacity-0 group-hover:opacity-100 transition-all shadow"
+                  className="absolute top-1.5 left-1.5 p-1 rounded-md bg-black/75 hover:bg-[#cc1616] text-white/90 hover:text-white text-[10px] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all shadow active:scale-90"
                   title="Kapak Fotoğrafı Yap"
                 >
                   <Star size={12} />
@@ -137,7 +137,7 @@ export default function MultiImageUploader({
               <button
                 type="button"
                 onClick={() => handleRemove(idx)}
-                className="absolute top-1.5 right-1.5 p-1 rounded-md bg-black/70 hover:bg-red-600 text-white/80 hover:text-white opacity-0 group-hover:opacity-100 transition-all shadow"
+                className="absolute top-1.5 right-1.5 p-1 rounded-md bg-black/75 hover:bg-red-600 text-white/90 hover:text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all shadow active:scale-90"
                 title="Görseli Kaldır"
               >
                 <X size={12} />

@@ -130,7 +130,7 @@ export default function Hero() {
                   gap: '0.75rem',
                   padding: '1.1rem 2.5rem',
                   background: 'linear-gradient(90deg, #cc1616 0%, #a81010 100%)',
-                  color: 'var(--color-text-primary)',
+                  color: '#ffffff',
                   border: 'none',
                   borderRadius: '2px',
                   fontSize: '0.85rem',

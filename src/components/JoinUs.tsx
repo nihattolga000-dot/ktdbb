@@ -102,7 +102,7 @@ export default function JoinUs() {
                   gap: '0.5rem',
                   padding: '0.85rem 1.75rem',
                   background: '#cc1616',
-                  color: 'var(--color-text-primary)',
+                  color: '#ffffff',
                   border: '2px solid #cc1616',
                   borderRadius: '4px',
                   fontSize: '0.78rem',

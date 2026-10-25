@@ -33,13 +33,10 @@ export default function ImageGalleryViewer({
   if (!images || images.length === 0) {
     return (
       <div
-        className="w-full rounded-2xl flex items-center justify-center border border-white/10"
-        style={{
-          aspectRatio,
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
-        }}
+        className="w-full rounded-2xl flex items-center justify-center border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-sm"
+        style={{ aspectRatio }}
       >
-        {fallbackIcon || <ImageIcon size={48} className="text-white/20" />}
+        {fallbackIcon || <ImageIcon size={48} className="text-[var(--color-text-muted)] opacity-40" />}
       </div>
     );
   }
@@ -59,12 +56,12 @@ export default function ImageGalleryViewer({
   return (
     <div className="w-full flex flex-col gap-3">
       {/* ANA GÖRSEL KARTI */}
-      <div className="relative group rounded-2xl overflow-hidden border border-white/10 bg-neutral-900/60 shadow-2xl backdrop-blur-sm">
+      <div className="relative group rounded-2xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-xl backdrop-blur-sm transition-colors duration-300">
         {/* Görsel Arka Işıltısı */}
         <div className="absolute -inset-1 bg-gradient-to-tr from-[#cc1616]/20 via-transparent to-transparent opacity-60 pointer-events-none" />
 
         <div
-          className="relative w-full cursor-pointer overflow-hidden flex items-center justify-center bg-black/40"
+          className="relative w-full cursor-pointer overflow-hidden flex items-center justify-center bg-black/10 dark:bg-black/40"
           style={{ aspectRatio }}
           onClick={() => setLightboxOpen(true)}
         >
@@ -86,7 +83,7 @@ export default function ImageGalleryViewer({
               e.stopPropagation();
               setLightboxOpen(true);
             }}
-            className="absolute top-3 right-3 p-2.5 rounded-xl bg-black/60 hover:bg-[#cc1616] text-white/90 hover:text-white backdrop-blur-md border border-white/10 transition-all opacity-80 group-hover:opacity-100 shadow-lg"
+            className="absolute top-3 right-3 p-2.5 rounded-xl bg-black/60 hover:bg-[#cc1616] text-white/90 hover:text-white backdrop-blur-md border border-white/10 transition-all opacity-85 group-hover:opacity-100 shadow-lg active:scale-95"
             title="Tam Ekran Görüntüle"
           >
             <Maximize2 size={16} />
@@ -105,7 +102,7 @@ export default function ImageGalleryViewer({
               <button
                 type="button"
                 onClick={handlePrev}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-[#cc1616] text-white border border-white/10 backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 shadow-xl"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-[#cc1616] text-white border border-white/10 backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 shadow-xl active:scale-95"
                 aria-label="Önceki Görsel"
               >
                 <ChevronLeft size={18} />
@@ -113,7 +110,7 @@ export default function ImageGalleryViewer({
               <button
                 type="button"
                 onClick={handleNext}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-[#cc1616] text-white border border-white/10 backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 shadow-xl"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-[#cc1616] text-white border border-white/10 backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 shadow-xl active:scale-95"
                 aria-label="Sonraki Görsel"
               >
                 <ChevronRight size={18} />
@@ -133,10 +130,10 @@ export default function ImageGalleryViewer({
                 key={idx}
                 type="button"
                 onClick={() => setActiveIndex(idx)}
-                className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all duration-200 active:scale-95 ${
                   isActive
                     ? 'border-[#cc1616] scale-100 ring-2 ring-[#cc1616]/40 shadow-lg'
-                    : 'border-white/10 opacity-60 hover:opacity-100 hover:border-white/30'
+                    : 'border-[var(--color-border)] opacity-70 hover:opacity-100 hover:border-[var(--color-border-light)]'
                 }`}
               >
                 <img

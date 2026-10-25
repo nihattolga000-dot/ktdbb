@@ -88,9 +88,10 @@ export default function EventDetail() {
   });
   const images = parseImageUrls(event.imageUrl);
   const coverImage = images[0] || null;
+  const isPast = evDate.getTime() < Date.now();
 
   return (
-    <div className="bg-[var(--color-bg-primary)] min-h-screen text-neutral-100 selection:bg-[#cc1616] selection:text-white">
+    <div className="bg-[var(--color-bg-primary)] min-h-screen text-[var(--color-text-primary)] selection:bg-[#cc1616] selection:text-white transition-colors duration-300">
       <Navbar />
 
       {/* BACKGROUND GLOW */}
@@ -99,23 +100,23 @@ export default function EventDetail() {
           <img
             src={coverImage}
             alt=""
-            className="w-full h-full object-cover filter blur-[90px] brightness-[0.18] saturate-150 scale-125"
+            className="w-full h-full object-cover filter blur-[100px] opacity-20 dark:opacity-30 dark:brightness-[0.25] brightness-[0.7] saturate-150 scale-125"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#070709]/80 to-[#070709]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-bg-primary)]/85 via-[var(--color-bg-primary)]/95 to-[var(--color-bg-primary)]" />
       </div>
 
       <main className="relative z-10 max-w-7xl mx-auto pt-24 sm:pt-28 pb-16 px-4 sm:px-6 lg:px-8">
         {/* GERİ DÖN LİNKİ */}
         <Link
           to="/"
-          className="inline-flex items-center gap-2 mb-8 text-neutral-400 hover:text-white text-xs uppercase tracking-wider font-semibold transition-colors py-1.5 px-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/10"
+          className="inline-flex items-center gap-2 mb-6 sm:mb-8 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-xs uppercase tracking-wider font-semibold transition-all py-2 px-3.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-[var(--color-border-light)] shadow-sm active:scale-95"
         >
           <ArrowLeft size={14} /> Ana Sayfaya Dön
         </Link>
 
         {/* RESPONSIVE LAYOUT */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start">
           
           {/* SOL: GÖRSEL / GALERİ & HAKKINDA BİLGİSİ */}
           <div className="lg:col-span-6 w-full flex flex-col gap-6">
@@ -123,15 +124,15 @@ export default function EventDetail() {
               images={images}
               title={event.title}
               aspectRatio="4/3"
-              fallbackIcon={<Calendar size={56} className="text-neutral-700" />}
+              fallbackIcon={<Calendar size={56} className="text-[var(--color-text-muted)]" />}
             />
 
-            <div className="bg-neutral-900/40 border border-white/5 rounded-2xl p-6 sm:p-8 backdrop-blur-sm shadow-xl">
-              <h2 className="font-['Oswald'] text-lg sm:text-xl uppercase tracking-wider text-white mb-4 flex items-center gap-3">
+            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl p-5 sm:p-8 backdrop-blur-md shadow-xl transition-colors duration-300">
+              <h2 className="font-['Oswald'] text-lg sm:text-xl uppercase tracking-wider text-[var(--color-text-primary)] mb-4 flex items-center gap-3">
                 <span className="w-6 h-0.5 bg-[#cc1616] rounded-full" />
                 Etkinlik Hakkında
               </h2>
-              <div className="text-neutral-300/90 leading-relaxed text-sm sm:text-base space-y-4 break-words">
+              <div className="text-[var(--color-text-secondary)] leading-relaxed text-sm sm:text-base space-y-4 break-words font-sans">
                 {event.description?.split("\n").map((p: string, i: number) =>
                   p.trim() ? <p key={i}>{p}</p> : null
                 )}
@@ -143,59 +144,79 @@ export default function EventDetail() {
           <div className="lg:col-span-6 w-full flex flex-col">
             
             {/* ETİKET */}
-            <div className="mb-4">
-              <span className="inline-flex items-center gap-2 bg-[#cc1616]/15 border border-[#cc1616]/30 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
-                <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
-                YAKLAŞAN ETKİNLİK
-              </span>
+            <div className="mb-3.5">
+              {isPast ? (
+                <span className="inline-flex items-center gap-2 bg-neutral-500/10 border border-neutral-500/30 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[var(--color-text-secondary)]">
+                  <CheckCircle2 size={12} className="text-neutral-400" />
+                  GEÇMİŞ ETKİNLİK / TAMAMLANDI
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2 bg-[#cc1616]/10 border border-[#cc1616]/30 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
+                  <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
+                  YAKLAŞAN ETKİNLİK
+                </span>
+              )}
             </div>
 
             {/* BAŞLIK */}
-            <h1 className="font-['Oswald'] text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-white leading-[1.1] mb-5 break-words">
+            <h1 className="font-['Oswald'] text-2xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[var(--color-text-primary)] leading-[1.15] mb-4 sm:mb-5 break-words">
               {event.title}
             </h1>
 
             {/* TARİH, SAAT, KONUM BİLGİLERİ */}
-            <div className="flex flex-wrap gap-2.5 mb-8">
-              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-medium text-neutral-300">
+            <div className="flex flex-wrap gap-2.5 mb-6 sm:mb-8">
+              <div className="inline-flex items-center gap-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl px-3.5 py-2 text-xs font-medium text-[var(--color-text-secondary)] shadow-sm">
                 <Calendar size={14} className="text-[#cc1616]" />
                 <span>{dateStr}</span>
               </div>
-              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-medium text-neutral-300">
+              <div className="inline-flex items-center gap-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl px-3.5 py-2 text-xs font-medium text-[var(--color-text-secondary)] shadow-sm">
                 <Clock size={14} className="text-[#cc1616]" />
                 <span>{timeStr}</span>
               </div>
               {event.location && (
-                <div className="inline-flex items-center gap-2 bg-[#cc1616]/15 border border-[#cc1616]/30 rounded-xl px-3.5 py-2 text-xs font-medium text-[#ff6b6b]">
+                <div className="inline-flex items-center gap-2 bg-[#cc1616]/10 border border-[#cc1616]/30 rounded-xl px-3.5 py-2 text-xs font-medium text-[#cc1616] shadow-sm">
                   <MapPin size={14} className="text-[#cc1616]" />
                   <span>{event.location}</span>
                 </div>
               )}
             </div>
 
-            {/* BAŞVURU FORMU KARTI */}
-            <div className="bg-[#0e0e12] border border-white/10 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md">
-              <div className="bg-gradient-to-r from-[#cc1616]/20 to-transparent border-b border-[#cc1616]/20 p-5 sm:p-7">
-                <h3 className="font-['Oswald'] text-xl sm:text-2xl uppercase tracking-wider text-white mb-1">
-                  Etkinliğe Başvur
+            {/* BAŞVURU FORMU VEYA TAMAMLANDI MESAJI */}
+            {isPast ? (
+              <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl p-6 sm:p-8 backdrop-blur-md shadow-xl text-center">
+                <div className="w-14 h-14 rounded-2xl bg-neutral-500/10 border border-neutral-500/20 text-neutral-400 flex items-center justify-center mx-auto mb-4">
+                  <Clock size={28} />
+                </div>
+                <h3 className="font-['Oswald'] text-xl uppercase tracking-wider text-[var(--color-text-primary)] mb-2">
+                  Etkinlik Tamamlandı
                 </h3>
-                <p className="text-neutral-400 text-xs sm:text-sm">Lütfen katılım formunu eksiksiz doldurun.</p>
+                <p className="text-[var(--color-text-secondary)] text-sm max-w-md mx-auto leading-relaxed">
+                  Bu etkinliğin tarihi sona ermiştir ve yeni katılım başvurusu kabul edilmemektedir. Güncel etkinliklerimiz için ajandamızı takip edebilirsiniz.
+                </p>
               </div>
+            ) : (
+              <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md transition-colors duration-300">
+                <div className="bg-gradient-to-r from-[#cc1616]/15 to-transparent border-b border-[var(--color-border)] p-5 sm:p-7">
+                  <h3 className="font-['Oswald'] text-xl sm:text-2xl uppercase tracking-wider text-[var(--color-text-primary)] mb-1">
+                    Etkinliğe Başvur
+                  </h3>
+                  <p className="text-[var(--color-text-muted)] text-xs sm:text-sm">Lütfen katılım formunu eksiksiz doldurun.</p>
+                </div>
 
               <div className="p-5 sm:p-7">
                 {formStatus === "success" ? (
                   <div className="text-center py-8">
                     <CheckCircle2 size={52} className="text-emerald-500 mx-auto mb-4" />
-                    <h4 className="text-emerald-400 font-['Oswald'] uppercase tracking-wider text-xl mb-2">
+                    <h4 className="text-emerald-500 font-['Oswald'] uppercase tracking-wider text-xl mb-2">
                       Başvurunuz Alındı!
                     </h4>
-                    <p className="text-neutral-400 text-sm max-w-sm mx-auto">{formMessage}</p>
+                    <p className="text-[var(--color-text-secondary)] text-sm max-w-sm mx-auto">{formMessage}</p>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-5">
                     {formStatus === "error" && (
-                      <div className="flex items-start gap-3 bg-red-950/40 border border-red-500/30 rounded-xl p-4 text-red-400 text-xs">
-                        <AlertCircle size={18} className="shrink-0 mt-0.5 text-red-500" />
+                      <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-red-500 text-xs">
+                        <AlertCircle size={18} className="shrink-0 mt-0.5" />
                         <span>{formMessage}</span>
                       </div>
                     )}
@@ -234,7 +255,7 @@ export default function EventDetail() {
                     <button
                       type="submit"
                       disabled={formStatus === "submitting"}
-                      className="mt-2 w-full py-4 px-6 rounded-xl font-['Oswald'] font-bold text-sm uppercase tracking-widest text-white bg-gradient-to-r from-[#cc1616] to-[#a01010] hover:from-[#e01818] hover:to-[#b51212] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#cc1616]/30 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      className="mt-2 w-full py-3.5 sm:py-4 px-6 rounded-xl font-['Oswald'] font-bold text-sm uppercase tracking-widest text-white bg-gradient-to-r from-[#cc1616] to-[#a01010] hover:from-[#e01818] hover:to-[#b51212] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#cc1616]/30 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.99]"
                     >
                       {formStatus === "submitting" ? (
                         <>
@@ -252,6 +273,7 @@ export default function EventDetail() {
                 )}
               </div>
             </div>
+            )}
 
           </div>
         </div>
@@ -283,7 +305,7 @@ function FormField({
 }) {
   return (
     <div className="w-full">
-      <label htmlFor={id} className="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-2">
+      <label htmlFor={id} className="block text-[11px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">
         {label}
       </label>
       <input
@@ -293,7 +315,7 @@ function FormField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="w-full bg-neutral-900/90 border border-white/10 rounded-xl px-4 py-3 text-neutral-100 text-sm placeholder:text-neutral-600 focus:outline-none focus:border-[#cc1616] focus:ring-1 focus:ring-[#cc1616]/50 transition-all"
+        className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-[var(--color-text-primary)] text-sm placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[#cc1616] focus:ring-1 focus:ring-[#cc1616]/50 transition-all"
       />
     </div>
   );

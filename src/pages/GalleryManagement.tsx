@@ -247,18 +247,18 @@ export default function GalleryManagement() {
             <p className="text-neutral-500 font-medium">Henüz galeride görsel bulunmuyor.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {items.map(item => (
               <div key={item.id} className="group flex flex-col bg-[#0e0e12] border border-neutral-800/60 rounded-2xl overflow-hidden hover:border-neutral-600 transition-all shadow-xl">
                 <div className="relative aspect-video bg-[#050505] overflow-hidden shrink-0 border-b border-neutral-800/60">
                   <img src={item.imageUrl} alt={item.title || 'Galeri'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                  <div className="absolute top-2.5 right-2.5 flex gap-1.5 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 translate-y-0 sm:translate-y-2 sm:group-hover:translate-y-0">
                     {canManage && (
                       <>
-                        <button onClick={() => handleEdit(item)} className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Düzenle">
+                        <button onClick={() => handleEdit(item)} className="bg-blue-600/90 hover:bg-blue-600 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md active:scale-95" title="Düzenle">
                           <Edit2 size={16} />
                         </button>
-                        <button onClick={() => handleDelete(item.id)} className="bg-[#cc1616] hover:bg-red-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Sil">
+                        <button onClick={() => handleDelete(item.id)} className="bg-[#cc1616]/90 hover:bg-red-700 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md active:scale-95" title="Sil">
                           <Trash2 size={16} />
                         </button>
                       </>

@@ -40,6 +40,7 @@ export default function EventsManagement() {
   const [error, setError] = useState('');
   
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [filterTab, setFilterTab] = useState<'all' | 'upcoming' | 'past'>('all');
 
   // Registrations state
   const [viewingEventId, setViewingEventId] = useState<string | null>(null);
@@ -245,10 +246,59 @@ export default function EventsManagement() {
 
       {/* LIST SECTION */}
       <div>
-        <h2 className="text-xl font-bold text-white mb-6 uppercase tracking-wider flex items-center gap-2">
-          <Calendar size={20} className="text-[#cc1616]" />
-          Yaklaşan ve Geçmiş Etkinlikler
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h2 className="text-xl font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <Calendar size={20} className="text-[#cc1616]" />
+            Etkinlik Listesi
+          </h2>
+
+          {/* Filter Tabs */}
+          {(() => {
+            const now = new Date();
+            const upCount = items.filter(e => new Date(e.eventDate) >= now).length;
+            const pastCount = items.filter(e => new Date(e.eventDate) < now).length;
+            return (
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-900 border border-neutral-800 w-fit">
+                <button
+                  type="button"
+                  onClick={() => setFilterTab('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+                    filterTab === 'all'
+                      ? 'bg-[#cc1616] text-white shadow-md'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  <span>Tümü</span>
+                  <span className="text-[10px] opacity-80">({items.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterTab('upcoming')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+                    filterTab === 'upcoming'
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  <span>Yaklaşan</span>
+                  <span className="text-[10px] opacity-80">({upCount})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterTab('past')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+                    filterTab === 'past'
+                      ? 'bg-neutral-700 text-white shadow-md'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  <span>Geçmiş</span>
+                  <span className="text-[10px] opacity-80">({pastCount})</span>
+                </button>
+              </div>
+            );
+          })()}
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 size={32} className="text-[#cc1616] animate-spin" /></div>
@@ -259,41 +309,60 @@ export default function EventsManagement() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map(item => {
-              const itemImages = parseImageUrls(item.imageUrl);
-              const coverImg = itemImages[0] || '';
-              return (
-                <div key={item.id} className="group flex flex-col bg-[#0e0e12] border border-neutral-800/60 rounded-2xl overflow-hidden hover:border-neutral-600 transition-all shadow-xl">
-                  <div className="relative h-56 bg-[#050505] overflow-hidden shrink-0 border-b border-neutral-800/60 p-4 flex items-center justify-center">
-                    {coverImg ? (
-                      <img src={coverImg} alt={item.title} className="max-w-full max-h-full object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-105" />
-                    ) : (
-                      <Calendar size={40} className="text-neutral-800" />
-                    )}
-                    {itemImages.length > 1 && (
-                      <div className="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white tracking-wider">
-                        +{itemImages.length} Görsel
-                      </div>
-                    )}
-                    <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                      <Link to={`/etkinlik/${item.id}`} target="_blank" className="bg-neutral-800/80 hover:bg-neutral-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Görüntüle">
-                        <Eye size={16} />
-                      </Link>
-                      {canManage && (
-                        <>
-                          <button onClick={() => handleViewRegistrations(item.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Katılımcıları Gör">
-                            <Users size={16} />
-                          </button>
-                          <button onClick={() => handleEdit(item)} className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Düzenle">
-                            <Edit2 size={16} />
-                          </button>
-                          <button onClick={() => handleDelete(item.id)} className="bg-[#cc1616] hover:bg-red-700 text-white p-2.5 rounded-xl shadow-lg backdrop-blur-sm" title="Sil">
-                            <Trash2 size={16} />
-                          </button>
-                        </>
+            {items
+              .filter(item => {
+                const now = new Date();
+                if (filterTab === 'upcoming') return new Date(item.eventDate) >= now;
+                if (filterTab === 'past') return new Date(item.eventDate) < now;
+                return true;
+              })
+              .map(item => {
+                const itemImages = parseImageUrls(item.imageUrl);
+                const coverImg = itemImages[0] || '';
+                const isPast = new Date(item.eventDate) < new Date();
+                return (
+                  <div key={item.id} className="group flex flex-col bg-[#0e0e12] border border-neutral-800/60 rounded-2xl overflow-hidden hover:border-neutral-600 transition-all shadow-xl">
+                    <div className="relative h-56 bg-[#050505] overflow-hidden shrink-0 border-b border-neutral-800/60 p-4 flex items-center justify-center">
+                      {coverImg ? (
+                        <img src={coverImg} alt={item.title} className="max-w-full max-h-full object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-105" />
+                      ) : (
+                        <Calendar size={40} className="text-neutral-800" />
                       )}
+                      <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                        {isPast ? (
+                          <span className="px-2 py-0.5 rounded-md bg-neutral-800/90 backdrop-blur-md border border-neutral-700 text-[10px] font-bold text-neutral-400 tracking-wider">
+                            Geçmiş
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wider">
+                            Yaklaşan
+                          </span>
+                        )}
+                        {itemImages.length > 1 && (
+                          <span className="px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white tracking-wider">
+                            +{itemImages.length}
+                          </span>
+                        )}
+                      </div>
+                      <div className="absolute top-2.5 right-2.5 flex gap-1.5 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 translate-y-0 sm:translate-y-2 sm:group-hover:translate-y-0">
+                        <Link to={`/etkinlik/${item.id}`} target="_blank" className="bg-neutral-900/90 hover:bg-neutral-800 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md border border-white/10 active:scale-95" title="Görüntüle">
+                          <Eye size={16} />
+                        </Link>
+                        {canManage && (
+                          <>
+                            <button onClick={() => handleViewRegistrations(item.id)} className="bg-emerald-600/90 hover:bg-emerald-600 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md active:scale-95" title="Katılımcıları Gör">
+                              <Users size={16} />
+                            </button>
+                            <button onClick={() => handleEdit(item)} className="bg-blue-600/90 hover:bg-blue-600 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md active:scale-95" title="Düzenle">
+                              <Edit2 size={16} />
+                            </button>
+                            <button onClick={() => handleDelete(item.id)} className="bg-[#cc1616]/90 hover:bg-red-700 text-white p-2 sm:p-2.5 rounded-xl shadow-lg backdrop-blur-md active:scale-95" title="Sil">
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
                   
                   <div className="p-5 flex-1 flex flex-col">
                     <div className="text-[#cc1616] text-[0.65rem] font-bold uppercase tracking-widest mb-2 flex justify-between">

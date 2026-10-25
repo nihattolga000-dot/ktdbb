@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { UserPlus, Trash2, Users, Shield, RefreshCw, Edit2, X, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../data/config';
@@ -299,11 +299,11 @@ export default function UserManagement() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         {u.id !== user?.id ? (
-                          <div className="flex justify-end gap-2">
-                            <button onClick={() => handleEdit(u)} className="text-neutral-500 hover:text-blue-400 hover:bg-blue-500/10 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 lg:focus:opacity-100" title="Düzenle">
+                          <div className="flex justify-end gap-1 sm:gap-2">
+                            <button onClick={() => handleEdit(u)} className="text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 p-2 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 active:scale-95" title="Düzenle">
                               <Edit2 size={18} />
                             </button>
-                            <button onClick={() => handleDeleteUser(u.id)} className="text-neutral-500 hover:text-[#ff4d4d] hover:bg-[#cc1616]/10 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 lg:focus:opacity-100" title="Sil">
+                            <button onClick={() => handleDeleteUser(u.id)} className="text-neutral-400 hover:text-[#ff4d4d] hover:bg-[#cc1616]/10 p-2 rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 active:scale-95" title="Sil">
                               <Trash2 size={18} />
                             </button>
                           </div>

@@ -50,26 +50,38 @@ export default function AdminLayout() {
 
       {/* SIDEBAR */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-72 bg-[#0d0d0f]/95 backdrop-blur-2xl border-r border-white/5 p-6 flex flex-col 
+        fixed lg:static inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-[#0d0d0f]/95 backdrop-blur-2xl border-r border-white/5 p-5 sm:p-6 flex flex-col 
         transform transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Subtle gradient background effect */}
         <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-[#cc1616]/10 to-transparent pointer-events-none" />
         
-        <div className="mb-8 relative z-10 hidden lg:block">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#cc1616] to-[#7a0d0d] rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20 border border-white/10">
-              <span className="font-bold text-white tracking-wider">KT</span>
+        <div className="mb-6 relative z-10">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#cc1616] to-[#7a0d0d] rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20 border border-white/10">
+                <span className="font-bold text-white tracking-wider">KT</span>
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold text-white tracking-widest uppercase">Admin Panel</h2>
+                <span className="text-[10px] text-neutral-400 block tracking-wider">YÖNETİM SİSTEMİ</span>
+              </div>
             </div>
-            <h2 className="font-display text-xl font-bold text-white tracking-widest uppercase">Admin</h2>
+            {/* Close button in mobile drawer */}
+            <button
+              onClick={closeMenu}
+              className="lg:hidden p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/5"
+            >
+              <X size={18} />
+            </button>
           </div>
           
           {user && (
-            <div className="bg-white/[0.02] rounded-xl p-4 border border-white/5">
-              <p className="text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Hoş Geldin</p>
+            <div className="bg-white/[0.03] rounded-xl p-3.5 border border-white/5">
+              <p className="text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Giriş Yapan Yetkili</p>
               <p className="text-white font-medium truncate text-sm">{user.name}</p>
-              <div className="mt-2 inline-flex items-center px-2 py-1 rounded-md bg-[#cc1616]/10 text-[#ff4d4d] text-[0.65rem] font-bold uppercase tracking-widest border border-[#cc1616]/20">
+              <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded-md bg-[#cc1616]/15 text-[#ff5c5c] text-[0.65rem] font-bold uppercase tracking-widest border border-[#cc1616]/25">
                 {user.role.replace('KOMISYON_', 'K_')}
               </div>
             </div>
@@ -181,9 +193,9 @@ export default function AdminLayout() {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 p-4 lg:p-10 lg:pl-16 overflow-y-auto relative min-h-screen">
+      <main className="flex-1 w-full min-w-0 p-3.5 sm:p-6 lg:p-10 lg:pl-16 overflow-y-auto overflow-x-hidden relative min-h-screen">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#cc1616] opacity-[0.03] blur-[150px] rounded-full pointer-events-none" />
-        <div className="max-w-6xl mx-auto relative z-10 pb-20">
+        <div className="max-w-6xl mx-auto relative z-10 pb-20 w-full min-w-0">
           <Outlet />
         </div>
       </main>

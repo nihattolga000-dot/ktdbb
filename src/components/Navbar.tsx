@@ -583,7 +583,7 @@ export default function Navbar() {
                 width: '100%',
                 padding: '1.2rem',
                 background: 'var(--color-red)',
-                color: 'var(--color-text-primary)',
+                color: '#ffffff',
                 border: 'none',
                 borderRadius: '4px',
                 fontFamily: 'var(--font-sans)',
