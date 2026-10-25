@@ -86,10 +86,10 @@ export default function ProjectDetail() {
         </Link>
 
         {/* RESPONSIVE LAYOUT (Mobile: 1 col, Desktop: 2 cols) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
           
           {/* SOL: GÖRSEL / ÇOKLU GALERİ */}
-          <div className="lg:col-span-6 w-full lg:sticky lg:top-28">
+          <div className="md:col-span-1 w-full md:sticky md:top-28">
             <ImageGalleryViewer
               images={images}
               title={project.title}
@@ -99,7 +99,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* SAĞ: BAŞLIK, ROZETLER & İÇERİK */}
-          <div className="lg:col-span-6 w-full flex flex-col">
+          <div className="md:col-span-1 w-full flex flex-col">
             
             {/* ETİKETLER */}
             <div className="flex flex-wrap items-center gap-2.5 mb-4">
