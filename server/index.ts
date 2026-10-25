@@ -43,26 +43,23 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
+// Ensure uploads directory exists (recursive + absolute path based on __dirname)
+const uploadsDir = path.resolve(__dirname, '..', 'uploads');
+try {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('[UPLOAD] uploads dir:', uploadsDir);
+} catch (e) {
+  console.error('[UPLOAD] Could not create uploads dir:', e);
 }
 
 // Serve static files from uploads
 app.use('/uploads', express.static(uploadsDir));
 
-// Multer storage config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir)
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
-  }
+// Multer: memory storage so we can handle errors and write manually
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
 });
-const upload = multer({ storage: storage });
 
 // --- Authentication Routes ---
 
@@ -228,26 +225,40 @@ app.put('/api/users/:id', authenticate, requireAdmin, async (req, res) => {
 // --- Upload Management ---
 app.post('/api/upload', authenticate, async (req: any, res: any) => {
   try {
+    // Base64/dataURL gönderildiyse doğrudan döndür
     if (req.body && req.body.image) {
       return res.json({ imageUrl: req.body.image });
     }
+
+    // Multer ile dosyayı memory'e al
     await new Promise<void>((resolve, reject) => {
       upload.single('image')(req, res, (err: any) => {
         if (err) {
-          console.error('Multer error:', err);
+          console.error('[UPLOAD] Multer error:', JSON.stringify(err));
           reject(err);
           return;
         }
         resolve();
       });
     });
-    if (req.file) {
-      return res.json({ imageUrl: `/uploads/${req.file.filename}` });
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Dosya yüklenmedi' });
     }
-    return res.status(400).json({ error: 'Dosya veya görsel verisi yüklenmedi' });
-  } catch (e) {
-    console.error('Upload route error:', e);
-    res.status(500).json({ error: 'Sunucu iç hatası' });
+
+    // Dosyayı diske yaz
+    const ext = path.extname(req.file.originalname) || '.jpg';
+    const filename = `image-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    const filepath = path.join(uploadsDir, filename);
+
+    console.log('[UPLOAD] Writing file to:', filepath);
+    fs.writeFileSync(filepath, req.file.buffer);
+    console.log('[UPLOAD] File written successfully:', filename);
+
+    return res.json({ imageUrl: `/uploads/${filename}` });
+  } catch (e: any) {
+    console.error('[UPLOAD] Error:', e?.message || e);
+    res.status(500).json({ error: `Sunucu iç hatası: ${e?.message || 'Bilinmeyen hata'}` });
   }
 });
 
