@@ -57,7 +57,9 @@ export default function GalleryManagement() {
     setError('');
     try {
       if (editingId) {
-        // Tekil güncelleme
+        // Tekil güncelleme - görseli önce sunucuya yükle, ardından URL'i kaydet
+        const uploaded = await uploadSingleImage(images[0]);
+        const imageUrl = uploaded?.imageUrl || images[0];
         const res = await fetch(`${API_BASE_URL}/api/gallery/${editingId}`, {
           method: 'PUT',
           headers: {
@@ -66,7 +68,7 @@ export default function GalleryManagement() {
           },
           body: JSON.stringify({ 
             title, 
-            imageUrl: images[0]
+            imageUrl
           })
         });
 
@@ -78,7 +80,9 @@ export default function GalleryManagement() {
           setError(data.error || 'Bir hata oluştu.');
         }
       } else if (images.length === 1) {
-        // Tekil ekleme
+        // Tekil ekleme - önce görseli sunucuya yükleyelim
+        const uploaded = await uploadSingleImage(images[0]);
+        const imageUrl = uploaded?.imageUrl || images[0];
         const res = await fetch(`${API_BASE_URL}/api/gallery`, {
           method: 'POST',
           headers: {
@@ -87,7 +91,7 @@ export default function GalleryManagement() {
           },
           body: JSON.stringify({ 
             title: title || undefined, 
-            imageUrl: images[0]
+            imageUrl
           })
         });
 
@@ -99,19 +103,19 @@ export default function GalleryManagement() {
           setError(data.error || 'Bir hata oluştu.');
         }
       } else {
-        // Toplu ekleme
+        // Toplu ekleme - önce tüm görselleri /api/upload ile sunucuya gönder, sonra batch oluştur
+        const uploadedItems = await Promise.all(images.map(img => uploadSingleImage(img)));
+        const items = uploadedItems.map((u, idx) => ({
+          title: title || undefined,
+          imageUrl: u?.imageUrl || images[idx]
+        }));
         const res = await fetch(`${API_BASE_URL}/api/gallery/batch`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ 
-            items: images.map(img => ({
-              title: title || undefined,
-              imageUrl: img
-            }))
-          })
+          body: JSON.stringify({ items })
         });
 
         if (res.ok) {
@@ -128,6 +132,31 @@ export default function GalleryManagement() {
       setSubmitting(false);
     }
   };
+
+  // Helper: Base64 string'i Blob -> File yapıp /api/upload endpoint'ine gönderir
+  const uploadSingleImage = async (base64: string): Promise<{ imageUrl: string } | null> => {
+    try {
+      // Base64 -> Blob
+      const response = await fetch(base64);
+      const blob = await response.blob();
+      const file = new File([blob], `upload_${Date.now()}.jpg`, { type: blob.type });
+      const form = new FormData();
+      form.append('image', file);
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: form
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return { imageUrl: data.imageUrl };
+    } catch (e) {
+      console.error('Görsel upload hatası', e);
+      return null;
+    }
+  };
+
+
 
   const handleEdit = (item: GalleryItem) => {
     setEditingId(item.id);
