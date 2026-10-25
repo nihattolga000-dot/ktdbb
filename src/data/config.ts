@@ -10,8 +10,7 @@
  * - Canlı sunucu: .env.production dosyasında VITE_API_URL=https://kayseritdb.com.tr
  *   (veya boş bırakırsanız aynı origin'den /api/... olarak istek atar)
  */
-export const API_BASE_URL: string =
-  import.meta.env.VITE_API_URL ?? '';
+export const API_BASE_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
 export const siteConfig = {
   name: 'Kayseri Turancı Dernekler Birliği',

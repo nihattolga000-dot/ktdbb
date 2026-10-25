@@ -105,9 +105,15 @@ export default function GalleryManagement() {
       } else {
         // Toplu ekleme - önce tüm görselleri /api/upload ile sunucuya gönder, sonra batch oluştur
         const uploadedItems = await Promise.all(images.map(img => uploadSingleImage(img)));
+        // Eğer herhangi bir görsel yüklenemediyse abort et
+        if (uploadedItems.some(item => item === null)) {
+          setError('Görsellerin bir veya birkaçı yüklenemedi. Lütfen tekrar deneyin.');
+          setSubmitting(false);
+          return;
+        }
         const items = uploadedItems.map((u, idx) => ({
           title: title || undefined,
-          imageUrl: u?.imageUrl || images[idx]
+          imageUrl: (u as { imageUrl: string }).imageUrl
         }));
         const res = await fetch(`${API_BASE_URL}/api/gallery/batch`, {
           method: 'POST',
