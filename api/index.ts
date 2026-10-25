@@ -67,8 +67,9 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
 
 // ────────────────────────────────────────────────────────────────────
 // Middlewares
@@ -208,9 +209,10 @@ router.put('/users/:id', authenticate, requireAdmin, async (req, res) => {
 // ────────────────────────────────────────────────────────────────────
 router.post('/upload', authenticate, async (req: any, res: any) => {
   try {
-    const { image } = req.body;
+    // Multipart form data gelirse req.body undefined/boş olabilir; güvenli eriş
+    const image = req.body?.image;
     if (!image) {
-      return res.status(400).json({ error: 'Görsel verisi bulunamadı.' });
+      return res.status(400).json({ error: 'Görsel verisi bulunamadı. Lütfen JSON body içinde "image" alanı gönderin.' });
     }
     return res.json({ imageUrl: image });
   } catch (error) {
@@ -218,6 +220,7 @@ router.post('/upload', authenticate, async (req: any, res: any) => {
     return res.status(500).json({ error: 'Görsel yüklenirken hata oluştu.' });
   }
 });
+
 
 // ────────────────────────────────────────────────────────────────────
 // News
@@ -280,16 +283,23 @@ router.delete('/news/:id', authenticate, requireSocialMedia, async (req, res) =>
   }
 });
 
-// ────────────────────────────────────────────────────────────────────
-// Gallery
-// ────────────────────────────────────────────────────────────────────
-router.get('/gallery', async (_req, res) => {
+// Toplu galeri ekleme (batch)
+router.post('/gallery/batch', authenticate, requireSocialMedia, async (req, res) => {
+  const { items } = req.body;
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'Yüklenecek görsel listesi bulunamadı' });
+  }
   try {
-    const items = await prisma.gallery.findMany({ orderBy: { createdAt: 'desc' } });
-    res.json(items);
+    const created = await prisma.gallery.createMany({
+      data: items.map((it: { title?: string; imageUrl: string }) => ({
+        title: it.title || null,
+        imageUrl: it.imageUrl,
+      })),
+    });
+    res.json({ message: 'Fotoğraflar başarıyla yüklendi', count: created.count });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Galeri getirilemedi' });
+    res.status(500).json({ error: 'Toplu fotoğraflar eklenemedi' });
   }
 });
 
@@ -305,9 +315,12 @@ router.post('/gallery', authenticate, requireSocialMedia, async (req, res) => {
 });
 
 router.put('/gallery/:id', authenticate, requireSocialMedia, async (req, res) => {
-  const { title } = req.body;
+  const { title, imageUrl } = req.body;
   try {
-    const item = await prisma.gallery.update({ where: { id: req.params.id }, data: { title } });
+    const item = await prisma.gallery.update({
+      where: { id: req.params.id },
+      data: { title, ...(imageUrl !== undefined ? { imageUrl } : {}) },
+    });
     res.json(item);
   } catch (error) {
     console.error(error);
@@ -324,6 +337,7 @@ router.delete('/gallery/:id', authenticate, requireSocialMedia, async (req, res)
     res.status(500).json({ error: 'Fotoğraf silinemedi' });
   }
 });
+
 
 // ────────────────────────────────────────────────────────────────────
 // Events
