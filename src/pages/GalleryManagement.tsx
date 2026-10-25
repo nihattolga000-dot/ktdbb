@@ -111,7 +111,7 @@ export default function GalleryManagement() {
           setSubmitting(false);
           return;
         }
-        const items = uploadedItems.map((u, idx) => ({
+        const items = uploadedItems.map(u => ({
           title: title || undefined,
           imageUrl: (u as { imageUrl: string }).imageUrl
         }));
