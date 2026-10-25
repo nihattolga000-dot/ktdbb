@@ -283,6 +283,19 @@ router.delete('/news/:id', authenticate, requireSocialMedia, async (req, res) =>
   }
 });
 
+// ────────────────────────────────────────────────────────────────────
+// Gallery
+// ────────────────────────────────────────────────────────────────────
+router.get('/gallery', async (_req, res) => {
+  try {
+    const items = await prisma.gallery.findMany({ orderBy: { createdAt: 'desc' } });
+    res.json(items);
+  } catch (error) {
+    console.error('Gallery GET error:', error);
+    res.status(500).json({ error: 'Galeri getirilemedi' });
+  }
+});
+
 // Toplu galeri ekleme (batch)
 router.post('/gallery/batch', authenticate, requireSocialMedia, async (req, res) => {
   const { items } = req.body;
