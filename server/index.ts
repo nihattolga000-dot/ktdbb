@@ -226,20 +226,29 @@ app.put('/api/users/:id', authenticate, requireAdmin, async (req, res) => {
 });
 
 // --- Upload Management ---
-app.post('/api/upload', authenticate, (req: any, res: any) => {
-  if (req.body && req.body.image) {
-    return res.json({ imageUrl: req.body.image });
-  }
-  upload.single('image')(req, res, (err: any) => {
-    if (err) return res.status(400).json({ error: 'Dosya yükleme hatası' });
-    if (req.file) {
-      return res.json({ imageUrl: `/uploads/${req.file.filename}` });
-    }
+app.post('/api/upload', authenticate, async (req: any, res: any) => {
+  try {
     if (req.body && req.body.image) {
       return res.json({ imageUrl: req.body.image });
     }
+    await new Promise<void>((resolve, reject) => {
+      upload.single('image')(req, res, (err: any) => {
+        if (err) {
+          console.error('Multer error:', err);
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    });
+    if (req.file) {
+      return res.json({ imageUrl: `/uploads/${req.file.filename}` });
+    }
     return res.status(400).json({ error: 'Dosya veya görsel verisi yüklenmedi' });
-  });
+  } catch (e) {
+    console.error('Upload route error:', e);
+    res.status(500).json({ error: 'Sunucu iç hatası' });
+  }
 });
 
 // --- News Management (Social Media Comm) ---
