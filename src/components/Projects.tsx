@@ -2,6 +2,7 @@ import { ArrowRight, Tag } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { API_BASE_URL } from '../data/config';
+import { getFirstImageUrl } from '../utils/imageUtils';
 
 export default function Projects() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -79,7 +80,7 @@ export default function Projects() {
                 }}
               >
                 <img
-                  src={project.imageUrl || 'https://via.placeholder.com/800x600?text=Kayseri+TDB+Proje'}
+                  src={getFirstImageUrl(project.imageUrl, 'https://via.placeholder.com/800x600?text=Kayseri+TDB+Proje')}
                   alt={project.title}
                   style={{
                     width: '100%',

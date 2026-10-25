@@ -3,7 +3,9 @@ import { useParams, Link } from "react-router-dom";
 import { Clock, MapPin, ArrowLeft, Calendar, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ImageGalleryViewer from "../components/ImageGalleryViewer";
 import { API_BASE_URL } from "../data/config";
+import { parseImageUrls } from "../utils/imageUtils";
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -12,13 +14,16 @@ export default function EventDetail() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [formStatus, setFormStatus] = useState<"idle"|"submitting"|"success"|"error">("idle");
+  const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formMessage, setFormMessage] = useState("");
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/events/${id}`)
-      .then(r => r.json())
-      .then(d => { setEvent(d); setLoading(false); })
+      .then((r) => r.json())
+      .then((d) => {
+        setEvent(d);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, [id]);
 
@@ -34,7 +39,9 @@ export default function EventDetail() {
       if (res.ok) {
         setFormStatus("success");
         setFormMessage("Başvurunuz alındı, sizi bekliyoruz!");
-        setName(""); setPhone(""); setEmail("");
+        setName("");
+        setPhone("");
+        setEmail("");
       } else {
         const d = await res.json();
         setFormStatus("error");
@@ -46,178 +53,247 @@ export default function EventDetail() {
     }
   };
 
-  if (loading) return (
-    <div style={{minHeight:"100vh",background:"var(--color-bg-primary)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div style={{textAlign:"center"}}>
-        <div style={{width:40,height:40,border:"2px solid #cc161640",borderTopColor:"#cc1616",borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 16px"}}/>
-        <p style={{color:"#666",fontFamily:"Oswald,sans-serif",letterSpacing:"0.3em",fontSize:11,textTransform:"uppercase"}}>Yükleniyor</p>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-[#cc1616]/30 border-t-[#cc1616] rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-neutral-500 font-['Oswald'] tracking-[0.3em] text-xs uppercase">Yükleniyor</p>
+        </div>
       </div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
-  );
+    );
+  }
 
-  if (!event || event.error) return (
-    <div style={{minHeight:"100vh",background:"var(--color-bg-primary)",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:24}}>
-      <Calendar size={48} color="#333"/>
-      <p style={{color:"#666",fontFamily:"Oswald,sans-serif",letterSpacing:"0.2em",textTransform:"uppercase"}}>Etkinlik Bulunamadı</p>
-      <Link to="/" style={{color:"#cc1616",fontSize:13,textDecoration:"none"}}>← Ana Sayfaya Dön</Link>
-    </div>
-  );
+  if (!event || event.error) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center flex-col gap-6 px-4">
+        <Calendar size={48} className="text-neutral-700" />
+        <p className="text-neutral-400 font-['Oswald'] tracking-widest text-lg uppercase">Etkinlik Bulunamadı</p>
+        <Link to="/" className="text-[#cc1616] hover:underline text-sm flex items-center gap-2">
+          ← Ana Sayfaya Dön
+        </Link>
+      </div>
+    );
+  }
 
   const evDate = new Date(event.eventDate);
-  const dateStr = evDate.toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"});
-  const timeStr = evDate.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
+  const dateStr = evDate.toLocaleDateString("tr-TR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const timeStr = evDate.toLocaleTimeString("tr-TR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const images = parseImageUrls(event.imageUrl);
+  const coverImage = images[0] || null;
 
   return (
-    <div style={{background:"var(--color-bg-primary)",minHeight:"100vh",color:"#f0f0f0"}}>
+    <div className="bg-[var(--color-bg-primary)] min-h-screen text-neutral-100 selection:bg-[#cc1616] selection:text-white">
       <Navbar />
 
       {/* BACKGROUND GLOW */}
-      <div style={{position:"fixed",inset:0,overflow:"hidden",pointerEvents:"none",zIndex:0}}>
-        {event.imageUrl && (
-          <img src={event.imageUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover",filter:"blur(80px) brightness(0.2) saturate(1.5)",transform:"scale(1.2)"}}/>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        {coverImage && (
+          <img
+            src={coverImage}
+            alt=""
+            className="w-full h-full object-cover filter blur-[90px] brightness-[0.18] saturate-150 scale-125"
+          />
         )}
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,#070709cc,#070709)"}}/>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#070709]/80 to-[#070709]" />
       </div>
 
-      <div style={{position:"relative",zIndex:1,maxWidth:1280,margin:"0 auto",padding:"120px 32px 80px"}}>
-        <Link to="/" style={{display:"inline-flex",alignItems:"center",gap:8,marginBottom:32,color:"#888",fontSize:12,textDecoration:"none",letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600,transition:"color 0.2s"}}>
-          <ArrowLeft size={14}/> Ana Sayfaya Dön
+      <main className="relative z-10 max-w-7xl mx-auto pt-24 sm:pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+        {/* GERİ DÖN LİNKİ */}
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 mb-8 text-neutral-400 hover:text-white text-xs uppercase tracking-wider font-semibold transition-colors py-1.5 px-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/10"
+        >
+          <ArrowLeft size={14} /> Ana Sayfaya Dön
         </Link>
 
-        {/* 2-COLUMN LAYOUT */}
-        <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,1.3fr)",gap:64,alignItems:"start"}}>
+        {/* RESPONSIVE LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* LEFT: IMAGE & DESC */}
-          <div style={{position:"sticky",top:120}}>
-            <div style={{position:"relative",marginBottom:32}}>
-              <div style={{position:"absolute",inset:-1,background:"linear-gradient(135deg,#cc1616,transparent 60%)",borderRadius:16,opacity:0.5}}/>
-              {event.imageUrl
-                ? <img src={event.imageUrl} alt={event.title} style={{width:"100%",height:"auto",borderRadius:14,display:"block",boxShadow:"0 32px 64px color-mix(in srgb, var(--color-bg-primary) 70%, transparent)",position:"relative"}}/>
-                : <div style={{aspectRatio:"3/4",background:"#111",borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}><Calendar size={56} color="#333"/></div>
-              }
-            </div>
+          {/* SOL: GÖRSEL / GALERİ & HAKKINDA BİLGİSİ */}
+          <div className="lg:col-span-6 w-full flex flex-col gap-6">
+            <ImageGalleryViewer
+              images={images}
+              title={event.title}
+              aspectRatio="4/3"
+              fallbackIcon={<Calendar size={56} className="text-neutral-700" />}
+            />
 
-            <div>
-              <h2 style={{fontFamily:"Oswald,sans-serif",fontSize:18,textTransform:"uppercase",letterSpacing:"0.1em",color:"var(--color-text-primary)",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
-                <span style={{display:"block",width:24,height:2,background:"#cc1616"}}/>
-                Hakkında
+            <div className="bg-neutral-900/40 border border-white/5 rounded-2xl p-6 sm:p-8 backdrop-blur-sm shadow-xl">
+              <h2 className="font-['Oswald'] text-lg sm:text-xl uppercase tracking-wider text-white mb-4 flex items-center gap-3">
+                <span className="w-6 h-0.5 bg-[#cc1616] rounded-full" />
+                Etkinlik Hakkında
               </h2>
-              <div style={{color:"#999",lineHeight:1.8,fontSize:14,wordBreak:"break-word",overflowWrap:"break-word"}}>
-                {event.description?.split("\n").map((p:string,i:number) => p.trim() ? <p key={i} style={{margin:"0 0 16px"}}>{p}</p> : null)}
+              <div className="text-neutral-300/90 leading-relaxed text-sm sm:text-base space-y-4 break-words">
+                {event.description?.split("\n").map((p: string, i: number) =>
+                  p.trim() ? <p key={i}>{p}</p> : null
+                )}
               </div>
             </div>
           </div>
 
-          {/* RIGHT: TITLE, META & FORM */}
-          <div>
-            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"#cc161620",border:"1px solid #cc161640",borderRadius:20,padding:"6px 16px",marginBottom:20}}>
-              <span style={{width:6,height:6,borderRadius:"50%",background:"#cc1616",animation:"pulse 2s infinite"}}/>
-              <span style={{color:"#cc1616",fontSize:10,fontWeight:700,letterSpacing:"0.25em",textTransform:"uppercase",fontFamily:"Oswald,sans-serif"}}>Yaklaşan Etkinlik</span>
+          {/* SAĞ: BAŞLIK, ROZETLER & KATILIM FORMU */}
+          <div className="lg:col-span-6 w-full flex flex-col">
+            
+            {/* ETİKET */}
+            <div className="mb-4">
+              <span className="inline-flex items-center gap-2 bg-[#cc1616]/15 border border-[#cc1616]/30 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
+                <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
+                YAKLAŞAN ETKİNLİK
+              </span>
             </div>
 
-            <h1 style={{fontFamily:"Oswald,sans-serif",fontSize:"clamp(2.5rem,4vw,4rem)",fontWeight:700,lineHeight:1.05,letterSpacing:"-0.01em",textTransform:"uppercase",margin:"0 0 32px",color:"var(--color-text-primary)"}}>
+            {/* BAŞLIK */}
+            <h1 className="font-['Oswald'] text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-white leading-[1.1] mb-5 break-words">
               {event.title}
             </h1>
 
-            <div style={{display:"flex",flexWrap:"wrap",gap:12,marginBottom:48}}>
-              <MetaBadge icon={<Calendar size={14} color="#cc1616"/>} label={dateStr}/>
-              <MetaBadge icon={<Clock size={14} color="#cc1616"/>} label={timeStr}/>
-              <MetaBadge icon={<MapPin size={14} color="#cc1616"/>} label={event.location} accent/>
+            {/* TARİH, SAAT, KONUM BİLGİLERİ */}
+            <div className="flex flex-wrap gap-2.5 mb-8">
+              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-medium text-neutral-300">
+                <Calendar size={14} className="text-[#cc1616]" />
+                <span>{dateStr}</span>
+              </div>
+              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs font-medium text-neutral-300">
+                <Clock size={14} className="text-[#cc1616]" />
+                <span>{timeStr}</span>
+              </div>
+              {event.location && (
+                <div className="inline-flex items-center gap-2 bg-[#cc1616]/15 border border-[#cc1616]/30 rounded-xl px-3.5 py-2 text-xs font-medium text-[#ff6b6b]">
+                  <MapPin size={14} className="text-[#cc1616]" />
+                  <span>{event.location}</span>
+                </div>
+              )}
             </div>
 
-            {/* THE FORM */}
-            <div style={{background:"#0e0e12",border:"1px solid #ffffff0d",borderRadius:20,overflow:"hidden",boxShadow:"0 24px 64px color-mix(in srgb, var(--color-bg-primary) 50%, transparent)"}}>
-              <div style={{background:"linear-gradient(135deg,#cc161615,#cc161605)",borderBottom:"1px solid #cc161620",padding:"24px 32px"}}>
-                <h3 style={{fontFamily:"Oswald,sans-serif",fontSize:22,textTransform:"uppercase",letterSpacing:"0.1em",color:"var(--color-text-primary)",margin:"0 0 6px"}}>
+            {/* BAŞVURU FORMU KARTI */}
+            <div className="bg-[#0e0e12] border border-white/10 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md">
+              <div className="bg-gradient-to-r from-[#cc1616]/20 to-transparent border-b border-[#cc1616]/20 p-5 sm:p-7">
+                <h3 className="font-['Oswald'] text-xl sm:text-2xl uppercase tracking-wider text-white mb-1">
                   Etkinliğe Başvur
                 </h3>
-                <p style={{color:"#666",fontSize:13,margin:0,letterSpacing:"0.05em"}}>Lütfen katılım formunu eksiksiz doldurun.</p>
+                <p className="text-neutral-400 text-xs sm:text-sm">Lütfen katılım formunu eksiksiz doldurun.</p>
               </div>
 
-              <div style={{padding:"32px"}}>
+              <div className="p-5 sm:p-7">
                 {formStatus === "success" ? (
-                  <div style={{textAlign:"center",padding:"32px 0"}}>
-                    <CheckCircle2 size={56} color="#22c55e" style={{margin:"0 auto 16px",display:"block"}}/>
-                    <h4 style={{color:"#22c55e",fontFamily:"Oswald,sans-serif",textTransform:"uppercase",letterSpacing:"0.1em",fontSize:20,margin:"0 0 8px"}}>Başvurunuz Alındı!</h4>
-                    <p style={{color:"#666",fontSize:14}}>{formMessage}</p>
+                  <div className="text-center py-8">
+                    <CheckCircle2 size={52} className="text-emerald-500 mx-auto mb-4" />
+                    <h4 className="text-emerald-400 font-['Oswald'] uppercase tracking-wider text-xl mb-2">
+                      Başvurunuz Alındı!
+                    </h4>
+                    <p className="text-neutral-400 text-sm max-w-sm mx-auto">{formMessage}</p>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} style={{display:"flex",flexDirection:"column",gap:24}}>
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                     {formStatus === "error" && (
-                      <div style={{display:"flex",gap:10,alignItems:"flex-start",background:"#cc161610",border:"1px solid #cc161630",borderRadius:10,padding:"16px"}}>
-                        <AlertCircle size={18} color="#cc1616" style={{flexShrink:0,marginTop:2}}/>
-                        <span style={{color:"#cc1616",fontSize:13}}>{formMessage}</span>
+                      <div className="flex items-start gap-3 bg-red-950/40 border border-red-500/30 rounded-xl p-4 text-red-400 text-xs">
+                        <AlertCircle size={18} className="shrink-0 mt-0.5 text-red-500" />
+                        <span>{formMessage}</span>
                       </div>
                     )}
 
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:24}}>
-                      <FormField label="Ad Soyad" id="f-name" type="text" value={name} onChange={setName} placeholder="Adınız Soyadınız" required/>
-                      <FormField label="Telefon" id="f-phone" type="tel" value={phone} onChange={setPhone} placeholder="05XX XXX XX XX" required/>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField
+                        label="Ad Soyad"
+                        id="f-name"
+                        type="text"
+                        value={name}
+                        onChange={setName}
+                        placeholder="Adınız Soyadınız"
+                        required
+                      />
+                      <FormField
+                        label="Telefon"
+                        id="f-phone"
+                        type="tel"
+                        value={phone}
+                        onChange={setPhone}
+                        placeholder="05XX XXX XX XX"
+                        required
+                      />
                     </div>
-                    <FormField label="E-posta" id="f-email" type="email" value={email} onChange={setEmail} placeholder="ornek@mail.com" required/>
 
-                    <button type="submit" disabled={formStatus === "submitting"} style={{
-                      marginTop: 16,
-                      background: formStatus === "submitting" ? "#333" : "linear-gradient(135deg,#cc1616,#a01010)",
-                      color:"var(--color-text-primary)",border:"none",borderRadius:10,padding:"18px 24px",
-                      fontFamily:"Oswald,sans-serif",fontWeight:700,fontSize:14,
-                      letterSpacing:"0.15em",textTransform:"uppercase",cursor:"pointer",
-                      display:"flex",alignItems:"center",justifyContent:"center",gap:10,
-                      transition:"all 0.3s",boxShadow: formStatus === "submitting" ? "none" : "0 8px 32px #cc161650"
-                    }}>
-                      {formStatus === "submitting"
-                        ? <><div style={{width:16,height:16,border:"2px solid #ffffff30",borderTopColor:"var(--color-text-primary)",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/> Gönderiliyor...</>
-                        : <><Send size={16}/> Başvuruyu Gönder</>
-                      }
+                    <FormField
+                      label="E-posta"
+                      id="f-email"
+                      type="email"
+                      value={email}
+                      onChange={setEmail}
+                      placeholder="ornek@mail.com"
+                      required
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={formStatus === "submitting"}
+                      className="mt-2 w-full py-4 px-6 rounded-xl font-['Oswald'] font-bold text-sm uppercase tracking-widest text-white bg-gradient-to-r from-[#cc1616] to-[#a01010] hover:from-[#e01818] hover:to-[#b51212] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#cc1616]/30 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      {formStatus === "submitting" ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Gönderiliyor...
+                        </>
+                      ) : (
+                        <>
+                          <Send size={16} />
+                          Başvuruyu Gönder
+                        </>
+                      )}
                     </button>
                   </form>
                 )}
               </div>
             </div>
-            {/* END FORM */}
 
           </div>
         </div>
-      </div>
+      </main>
 
-      <div style={{ position: "relative", zIndex: 10 }}>
-        <Footer/>
+      <div className="relative z-10">
+        <Footer />
       </div>
-      
-      <style>{`
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-        body{background:#070709}
-      `}</style>
     </div>
   );
 }
 
-function MetaBadge({icon,label,accent}:{icon:React.ReactNode;label:string;accent?:boolean}) {
-  return (
-    <div style={{display:"inline-flex",alignItems:"center",gap:8,
-      background: accent ? "#cc161620" : "#ffffff08",
-      border: accent ? "1px solid #cc161640" : "1px solid #ffffff10",
-      borderRadius:24,padding:"10px 18px"
-    }}>
-      {icon}
-      <span style={{color: accent ? "#ff6b6b" : "#ccc",fontSize:13,fontWeight:500,letterSpacing:"0.05em"}}>{label}</span>
-    </div>
-  );
-}
-
-function FormField({label,id,type,value,onChange,placeholder,required}:{
-  label:string;id:string;type:string;value:string;
-  onChange:(v:string)=>void;placeholder:string;required?:boolean
+function FormField({
+  label,
+  id,
+  type,
+  value,
+  onChange,
+  placeholder,
+  required,
+}: {
+  label: string;
+  id: string;
+  type: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  required?: boolean;
 }) {
   return (
-    <div>
-      <label htmlFor={id} style={{display:"block",color:"#777",fontSize:11,fontWeight:700,letterSpacing:"0.2em",textTransform:"uppercase",marginBottom:10}}>{label}</label>
-      <input id={id} type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} required={required}
-        style={{width:"100%",background:"var(--color-bg-primary)",border:"1px solid #ffffff15",borderRadius:10,padding:"14px 16px",color:"#f0f0f0",fontSize:15,outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}}
-        onFocus={e=>(e.target.style.borderColor="#cc1616")}
-        onBlur={e=>(e.target.style.borderColor="#ffffff15")}
+    <div className="w-full">
+      <label htmlFor={id} className="block text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-2">
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        required={required}
+        className="w-full bg-neutral-900/90 border border-white/10 rounded-xl px-4 py-3 text-neutral-100 text-sm placeholder:text-neutral-600 focus:outline-none focus:border-[#cc1616] focus:ring-1 focus:ring-[#cc1616]/50 transition-all"
       />
     </div>
   );

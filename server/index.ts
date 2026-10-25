@@ -323,6 +323,26 @@ app.post('/api/gallery', authenticate, requireSocialMedia, async (req, res) => {
   }
 });
 
+// Batch create gallery items
+app.post('/api/gallery/batch', authenticate, requireSocialMedia, async (req, res) => {
+  const { items } = req.body;
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'Yüklenecek görsel listesi bulunamadı' });
+  }
+  try {
+    const created = await prisma.gallery.createMany({
+      data: items.map((it: { title?: string; imageUrl: string }) => ({
+        title: it.title || null,
+        imageUrl: it.imageUrl
+      }))
+    });
+    res.json({ message: 'Fotoğraflar başarıyla yüklendi', count: created.count });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Toplu fotoğraflar eklenemedi' });
+  }
+});
+
 app.put('/api/gallery/:id', authenticate, requireSocialMedia, async (req, res) => {
   const { title } = req.body;
   try {
@@ -443,7 +463,7 @@ app.put('/api/events/:id', authenticate, requireEventComm, async (req, res) => {
         description, 
         location, 
         eventDate: new Date(eventDate), 
-        ...(imageUrl && { imageUrl }) 
+        ...(imageUrl !== undefined ? { imageUrl } : {}) 
       }
     });
     res.json(event);
@@ -508,7 +528,7 @@ app.put('/api/projects/:id', authenticate, requireEventComm, async (req, res) =>
         title, 
         description, 
         status, 
-        ...(imageUrl && { imageUrl }) 
+        ...(imageUrl !== undefined ? { imageUrl } : {}) 
       }
     });
     res.json(project);
