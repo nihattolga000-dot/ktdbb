@@ -5,38 +5,48 @@
 
 :root {
   /* ─── Koyu Tema (Varsayılan) ─── */
-  --theme-bg-primary:   #0d0d0d;
-  --theme-bg-secondary: #141414;
-  --theme-bg-card:      #1a1a1a;
-  --theme-bg-elevated:  #222222;
+  --theme-bg-primary:   #0d0d0f;
+  --theme-bg-secondary: #131316;
+  --theme-bg-card:      #18181c;
+  --theme-bg-elevated:  #222228;
 
-  --theme-text-primary:   #f5f5f5;
-  --theme-text-secondary: rgba(245,245,245,0.65);
-  --theme-text-muted:     rgba(245,245,245,0.38);
+  --theme-text-primary:   #f8fafc;
+  --theme-text-secondary: rgba(248, 250, 252, 0.7);
+  --theme-text-muted:     rgba(248, 250, 252, 0.42);
 
   --theme-red:       #cc1616;
   --theme-red-hover: #a81010;
-  --theme-red-glow:  rgba(204,22,22,0.25);
+  --theme-red-glow:  rgba(204, 22, 22, 0.25);
 
-  --theme-border:       rgba(255,255,255,0.08);
-  --theme-border-light: rgba(255,255,255,0.14);
+  --theme-border:       rgba(255, 255, 255, 0.08);
+  --theme-border-light: rgba(255, 255, 255, 0.15);
 }
 
 .light {
-  /* ─── Açık Tema ─── */
-  --theme-bg-primary:   #f8f9fa;
+  /* ─── Açık Tema (Ultra Premium Executive) ─── */
+  --theme-bg-primary:   #f8fafc;
   --theme-bg-secondary: #ffffff;
   --theme-bg-card:      #ffffff;
-  --theme-bg-elevated:  #f0f0f0;
+  --theme-bg-elevated:  #f1f5f9;
 
-  --theme-text-primary:   #111111;
-  --theme-text-secondary: rgba(17,17,17,0.7);
-  --theme-text-muted:     rgba(17,17,17,0.4);
+  --theme-text-primary:   #0f172a;
+  --theme-text-secondary: #334155;
+  --theme-text-muted:     #64748b;
 
-  --theme-border:       rgba(0,0,0,0.1);
-  --theme-border-light: rgba(0,0,0,0.15);
+  --theme-border:       rgba(15, 23, 42, 0.08);
+  --theme-border-light: rgba(15, 23, 42, 0.14);
   
-  --theme-red-glow:  rgba(204,22,22,0.15);
+  --theme-red-glow:  rgba(204, 22, 22, 0.12);
+}
+
+.light .shadow-lg,
+.light .shadow-xl,
+.light .shadow-2xl {
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+}
+
+.light .shadow-sm {
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04);
 }
 
 @theme {

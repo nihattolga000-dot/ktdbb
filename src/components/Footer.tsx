@@ -51,7 +51,7 @@ export default function Footer() {
     <footer
       id="footer"
       style={{
-        background: 'rgba(8,8,8,0.35)',
+        background: 'var(--color-bg-secondary)',
         borderTop: '1px solid var(--color-border)',
       }}
     >

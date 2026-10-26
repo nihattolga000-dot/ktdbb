@@ -33,10 +33,24 @@ export default function ImageGalleryViewer({
   if (!images || images.length === 0) {
     return (
       <div
-        className="w-full rounded-2xl flex items-center justify-center border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-sm"
+        className="relative w-full rounded-3xl overflow-hidden flex flex-col items-center justify-center p-8 border border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-md transition-colors duration-300"
         style={{ aspectRatio }}
       >
-        {fallbackIcon || <ImageIcon size={48} className="text-[var(--color-text-muted)] opacity-40" />}
+        {/* Dekoratif hafif desen */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#cc1616]/5 via-transparent to-[#cc1616]/5 pointer-events-none" />
+        <div className="relative z-10 flex flex-col items-center text-center gap-3">
+          <div className="w-16 h-16 rounded-2xl bg-[#cc1616]/10 border border-[#cc1616]/20 flex items-center justify-center text-[#cc1616] shadow-sm">
+            {fallbackIcon || <ImageIcon size={32} />}
+          </div>
+          <div>
+            <p className="font-['Oswald'] text-sm uppercase tracking-widest text-[var(--color-text-primary)] font-bold">
+              Kayseri TDB Arşivi
+            </p>
+            <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+              Bu içerik için görsel eklenmemiştir
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -56,12 +70,12 @@ export default function ImageGalleryViewer({
   return (
     <div className="w-full flex flex-col gap-3">
       {/* ANA GÖRSEL KARTI */}
-      <div className="relative group rounded-2xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-xl backdrop-blur-sm transition-colors duration-300">
+      <div className="relative group rounded-3xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-lg backdrop-blur-sm transition-all duration-300">
         {/* Görsel Arka Işıltısı */}
-        <div className="absolute -inset-1 bg-gradient-to-tr from-[#cc1616]/20 via-transparent to-transparent opacity-60 pointer-events-none" />
+        <div className="absolute -inset-1 bg-gradient-to-tr from-[#cc1616]/15 via-transparent to-transparent opacity-50 pointer-events-none" />
 
         <div
-          className="relative w-full cursor-pointer overflow-hidden flex items-center justify-center bg-black/10 dark:bg-black/40"
+          className="relative w-full cursor-pointer overflow-hidden flex items-center justify-center bg-black/5"
           style={{ aspectRatio }}
           onClick={() => setLightboxOpen(true)}
         >
@@ -73,8 +87,8 @@ export default function ImageGalleryViewer({
             loading="lazy"
           />
 
-          {/* Karartma degrade */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+          {/* Alt hafif degrade - yazılar ve ikonlar için */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
 
           {/* Büyütme (Fullscreen) Rozeti */}
           <button
