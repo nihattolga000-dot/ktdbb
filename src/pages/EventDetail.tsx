@@ -72,7 +72,8 @@ export default function EventDetail() {
     setFormMessage("");
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/events/${id}/apply`, {
+      // Backend /events/:id/register endpoint'ini kullanır
+      const res = await fetch(`${API_BASE_URL}/api/events/${id}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, email }),
@@ -133,20 +134,29 @@ export default function EventDetail() {
     );
   }
 
-  const evDate = new Date(event.date);
-  const dateStr = evDate.toLocaleDateString("tr-TR", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  const timeStr = evDate.toLocaleTimeString("tr-TR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  // Tarih Çözümleme (eventDate veya date veya createdAt)
+  const rawDateStr = event.eventDate || event.date || event.createdAt;
+  const evDate = rawDateStr ? new Date(rawDateStr) : new Date();
+  const isValidDate = !isNaN(evDate.getTime());
+
+  const dateStr = isValidDate
+    ? evDate.toLocaleDateString("tr-TR", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "Tarih Belirtilmedi";
+
+  const timeStr = isValidDate
+    ? evDate.toLocaleTimeString("tr-TR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "Saat Belirtilmedi";
 
   const images = parseImageUrls(event.imageUrl);
-  const isPast = evDate.getTime() < Date.now();
+  const isPast = isValidDate && evDate.getTime() < Date.now();
 
   return (
     <div className="bg-[var(--color-bg-primary)] min-h-screen text-[var(--color-text-primary)] selection:bg-[#cc1616] selection:text-white transition-colors duration-300">
@@ -154,13 +164,13 @@ export default function EventDetail() {
 
       {/* AMBIENT BACKGROUND GLOW */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-[#cc1616]/10 via-[#cc1616]/3 to-transparent blur-[120px] rounded-full" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-gradient-to-b from-[#cc1616]/10 via-[#cc1616]/3 to-transparent blur-[130px] rounded-full" />
       </div>
 
-      <main className="relative z-10 max-w-7xl mx-auto pt-32 sm:pt-36 pb-20 px-4 sm:px-6 lg:px-8">
+      <main className="relative z-10 max-w-7xl mx-auto pt-36 sm:pt-40 lg:pt-44 pb-20 px-4 sm:px-6 lg:px-8">
         
-        {/* BREADCRUMB & GERİ DÖNÜŞ ÇUBUĞU */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--color-border)]">
+        {/* BREADCRUMB & AKSİYON BARI */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
             <Link to="/" className="hover:text-[#cc1616] transition-colors font-medium">
               Ana Sayfa
@@ -170,7 +180,7 @@ export default function EventDetail() {
               Etkinlikler
             </Link>
             <ChevronRight size={14} className="opacity-50" />
-            <span className="text-[var(--color-text-primary)] font-semibold truncate max-w-[200px] sm:max-w-xs">
+            <span className="text-[var(--color-text-primary)] font-semibold truncate max-w-[180px] sm:max-w-xs">
               {event.title}
             </span>
           </div>
@@ -194,15 +204,84 @@ export default function EventDetail() {
           </div>
         </div>
 
+        {/* FULL-WIDTH HEADER ALANI (Desktop ve Mobilde Asla Kesilmez) */}
+        <div className="mb-10">
+          <div className="flex flex-wrap items-center gap-3 mb-3.5">
+            {isPast ? (
+              <span className="inline-flex items-center gap-2 bg-neutral-500/10 border border-neutral-500/25 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[var(--color-text-secondary)]">
+                <CheckCircle2 size={12} className="text-neutral-400" />
+                GEÇMİŞ ETKİNLİK / TAMAMLANDI
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2 bg-[#cc1616]/10 border border-[#cc1616]/25 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
+                <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
+                YAKLAŞAN ETKİNLİK
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] font-medium">
+              <Calendar size={13} className="text-[#cc1616]" /> {dateStr}
+            </span>
+          </div>
+
+          <h1 className="font-['Oswald'] text-3xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-[var(--color-text-primary)] leading-[1.1] mb-6 break-words">
+            {event.title}
+          </h1>
+
+          {/* HIZLI BİLGİ ROZETLERİ (TARİH, SAAT, MEKAN) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="flex items-center gap-3 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl p-4 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-[#cc1616]/10 text-[#cc1616] flex items-center justify-center shrink-0">
+                <Calendar size={18} />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold">
+                  Etkinlik Tarihi
+                </div>
+                <div className="text-xs sm:text-sm font-semibold text-[var(--color-text-primary)] truncate mt-0.5">
+                  {dateStr}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl p-4 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-[#cc1616]/10 text-[#cc1616] flex items-center justify-center shrink-0">
+                <Clock size={18} />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold">
+                  Başlama Saati
+                </div>
+                <div className="text-xs sm:text-sm font-semibold text-[var(--color-text-primary)] truncate mt-0.5">
+                  {timeStr}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl p-4 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-[#cc1616]/10 text-[#cc1616] flex items-center justify-center shrink-0">
+                <MapPin size={18} />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold">
+                  Konum / Buluşma
+                </div>
+                <div className="text-xs sm:text-sm font-semibold text-[var(--color-text-primary)] truncate mt-0.5">
+                  {event.location || "Kayseri"}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* ANA İKİLİ IZGARA (Layout) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* SOL SÜTUN: GÖRSEL / GALERİ & ETKİNLİK DETAY AÇIKLAMASI (lg:col-span-6) */}
-          <div className="lg:col-span-6 w-full flex flex-col gap-6">
+          {/* SOL SÜTUN: GÖRSEL / GALERİ & ETKİNLİK DETAY AÇIKLAMASI (lg:col-span-7) */}
+          <div className="lg:col-span-7 w-full flex flex-col gap-6">
             <ImageGalleryViewer
               images={images}
               title={event.title}
-              aspectRatio="4/3"
+              aspectRatio="16/10"
               fallbackIcon={<CalendarCheck size={40} />}
             />
 
@@ -211,7 +290,7 @@ export default function EventDetail() {
               <div className="flex items-center gap-3 pb-4 mb-5 border-b border-[var(--color-border)]">
                 <span className="w-8 h-1 bg-[#cc1616] rounded-full" />
                 <h2 className="font-['Oswald'] text-lg uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
-                  Etkinlik Hakkında
+                  Etkinlik Programı ve Detayları
                 </h2>
               </div>
 
@@ -233,77 +312,8 @@ export default function EventDetail() {
             </div>
           </div>
 
-          {/* SAĞ SÜTUN: BAŞLIK, ZAMAN KARTLARI & BAŞVURU FORMU (lg:col-span-6) */}
-          <div className="lg:col-span-6 w-full flex flex-col">
-            
-            {/* ETİKET */}
-            <div className="mb-4">
-              {isPast ? (
-                <span className="inline-flex items-center gap-2 bg-neutral-500/10 border border-neutral-500/25 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[var(--color-text-secondary)]">
-                  <CheckCircle2 size={12} className="text-neutral-400" />
-                  GEÇMİŞ ETKİNLİK / TAMAMLANDI
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-2 bg-[#cc1616]/10 border border-[#cc1616]/25 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
-                  <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
-                  YAKLAŞAN ETKİNLİK
-                </span>
-              )}
-            </div>
-
-            {/* BAŞLIK */}
-            <h1 className="font-['Oswald'] text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[var(--color-text-primary)] leading-[1.12] mb-6 break-words">
-              {event.title}
-            </h1>
-
-            {/* ZAMAN & MEKAN KARTLARI */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              <div className="flex items-center gap-3.5 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl p-4 shadow-sm">
-                <div className="w-10 h-10 rounded-xl bg-[#cc1616]/10 text-[#cc1616] flex items-center justify-center shrink-0">
-                  <Calendar size={18} />
-                </div>
-                <div>
-                  <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold">
-                    Tarih
-                  </div>
-                  <div className="text-xs sm:text-sm font-semibold text-[var(--color-text-primary)] mt-0.5">
-                    {dateStr}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3.5 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl p-4 shadow-sm">
-                <div className="w-10 h-10 rounded-xl bg-[#cc1616]/10 text-[#cc1616] flex items-center justify-center shrink-0">
-                  <Clock size={18} />
-                </div>
-                <div>
-                  <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold">
-                    Saat
-                  </div>
-                  <div className="text-xs sm:text-sm font-semibold text-[var(--color-text-primary)] mt-0.5">
-                    {timeStr}
-                  </div>
-                </div>
-              </div>
-
-              {event.location && (
-                <div className="sm:col-span-2 flex items-center gap-3.5 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl p-4 shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-[#cc1616]/10 text-[#cc1616] flex items-center justify-center shrink-0">
-                    <MapPin size={18} />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold">
-                      Konum / Adres
-                    </div>
-                    <div className="text-xs sm:text-sm font-semibold text-[var(--color-text-primary)] mt-0.5">
-                      {event.location}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* BAŞVURU FORMU VEYA TAMAMLANDI MESAJI */}
+          {/* SAĞ SÜTUN: BAŞVURU FORMU VEYA BİLGİLENDİRME (lg:col-span-5) */}
+          <div className="lg:col-span-5 w-full flex flex-col lg:sticky lg:top-28">
             {isPast ? (
               <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-3xl p-8 shadow-lg text-center transition-colors duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-neutral-500/10 border border-neutral-500/20 text-neutral-400 flex items-center justify-center mx-auto mb-4">
@@ -312,15 +322,21 @@ export default function EventDetail() {
                 <h3 className="font-['Oswald'] text-xl uppercase tracking-wider text-[var(--color-text-primary)] mb-2 font-bold">
                   Etkinlik Tamamlandı
                 </h3>
-                <p className="text-[var(--color-text-secondary)] text-sm max-w-md mx-auto leading-relaxed">
+                <p className="text-[var(--color-text-secondary)] text-sm leading-relaxed mb-6">
                   Bu etkinliğin tarihi sona ermiştir ve yeni katılım başvurusu kabul edilmemektedir. Güncel faaliyetlerimiz için ajandamızı takip edebilirsiniz.
                 </p>
+                <Link
+                  to="/#etkinlikler"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] text-xs font-['Oswald'] uppercase tracking-wider font-bold hover:bg-[#cc1616] hover:text-white transition-all"
+                >
+                  Tüm Etkinliklere Göz At
+                </Link>
               </div>
             ) : (
               <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-3xl overflow-hidden shadow-xl transition-colors duration-300">
                 <div className="bg-gradient-to-r from-[#cc1616]/10 to-transparent border-b border-[var(--color-border)] p-6">
                   <div className="flex items-center gap-2 text-[#cc1616] font-['Oswald'] text-xs font-bold uppercase tracking-widest mb-1">
-                    <Sparkles size={14} /> KONTENJANLA SINIRLIDIR
+                    <Sparkles size={14} /> KATILIM ÜCRETSİZDİR
                   </div>
                   <h3 className="font-['Oswald'] text-2xl uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
                     Etkinliğe Başvur
@@ -330,9 +346,9 @@ export default function EventDetail() {
                   </p>
                 </div>
 
-                <div className="p-6 sm:p-8">
+                <div className="p-6 sm:p-7">
                   {formStatus === "success" ? (
-                    <div className="text-center py-8">
+                    <div className="text-center py-6">
                       <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto mb-4">
                         <CheckCircle2 size={36} />
                       </div>
@@ -344,7 +360,7 @@ export default function EventDetail() {
                       </p>
                     </div>
                   ) : (
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-5">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                       {formStatus === "error" && (
                         <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-2xl p-4 text-red-500 text-xs">
                           <AlertCircle size={18} className="shrink-0 mt-0.5" />
@@ -352,26 +368,25 @@ export default function EventDetail() {
                         </div>
                       )}
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormField
-                          label="Ad Soyad"
-                          id="f-name"
-                          type="text"
-                          value={name}
-                          onChange={setName}
-                          placeholder="Adınız Soyadınız"
-                          required
-                        />
-                        <FormField
-                          label="Telefon"
-                          id="f-phone"
-                          type="tel"
-                          value={phone}
-                          onChange={setPhone}
-                          placeholder="05XX XXX XX XX"
-                          required
-                        />
-                      </div>
+                      <FormField
+                        label="Ad Soyad"
+                        id="f-name"
+                        type="text"
+                        value={name}
+                        onChange={setName}
+                        placeholder="Adınız Soyadınız"
+                        required
+                      />
+
+                      <FormField
+                        label="Telefon"
+                        id="f-phone"
+                        type="tel"
+                        value={phone}
+                        onChange={setPhone}
+                        placeholder="05XX XXX XX XX"
+                        required
+                      />
 
                       <FormField
                         label="E-posta"
@@ -396,7 +411,7 @@ export default function EventDetail() {
                         ) : (
                           <>
                             <Send size={16} />
-                            <span>Başvuruyu Gönder</span>
+                            <span>Başvuruyu Tamamla</span>
                           </>
                         )}
                       </button>
@@ -405,7 +420,6 @@ export default function EventDetail() {
                 </div>
               </div>
             )}
-
           </div>
         </div>
 
@@ -433,10 +447,11 @@ export default function EventDetail() {
               {otherEvents.map((ev) => {
                 const evImgs = parseImageUrls(ev.imageUrl);
                 const evCover = evImgs[0] || null;
-                const otherDate = new Date(ev.date).toLocaleDateString("tr-TR", {
+                const oDate = ev.eventDate || ev.date || ev.createdAt;
+                const otherDate = oDate ? new Date(oDate).toLocaleDateString("tr-TR", {
                   day: "numeric",
                   month: "short",
-                });
+                }) : "";
 
                 return (
                   <Link
@@ -444,7 +459,7 @@ export default function EventDetail() {
                     to={`/etkinlik/${ev.id}`}
                     className="group bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-[#cc1616]/50 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
                   >
-                    <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-bg-elevated)]">
+                    <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-bg-elevated)] min-h-[160px]">
                       {evCover ? (
                         <img
                           src={evCover}
@@ -457,9 +472,11 @@ export default function EventDetail() {
                           <CalendarCheck size={32} />
                         </div>
                       )}
-                      <span className="absolute top-3 left-3 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/10">
-                        {otherDate}
-                      </span>
+                      {otherDate && (
+                        <span className="absolute top-3 left-3 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/10">
+                          {otherDate}
+                        </span>
+                      )}
                     </div>
 
                     <div className="p-5 flex-1 flex flex-col justify-between">

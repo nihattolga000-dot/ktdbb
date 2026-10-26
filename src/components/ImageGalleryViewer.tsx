@@ -55,15 +55,18 @@ export default function ImageGalleryViewer({
     );
   }
 
+  const [imgError, setImgError] = useState(false);
   const currentImage = images[activeIndex] || images[0];
 
   const handlePrev = (e?: React.MouseEvent) => {
     e?.stopPropagation();
+    setImgError(false);
     setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   const handleNext = (e?: React.MouseEvent) => {
     e?.stopPropagation();
+    setImgError(false);
     setActiveIndex((prev) => (prev + 1) % images.length);
   };
 
@@ -75,17 +78,27 @@ export default function ImageGalleryViewer({
         <div className="absolute -inset-1 bg-gradient-to-tr from-[#cc1616]/15 via-transparent to-transparent opacity-50 pointer-events-none" />
 
         <div
-          className="relative w-full cursor-pointer overflow-hidden flex items-center justify-center bg-black/5"
-          style={{ aspectRatio }}
-          onClick={() => setLightboxOpen(true)}
+          className="relative w-full cursor-pointer overflow-hidden flex items-center justify-center bg-black/5 min-h-[240px] xs:min-h-[280px] sm:min-h-[340px] md:min-h-[380px]"
+          style={{ aspectRatio: aspectRatio || '16/10' }}
+          onClick={() => !imgError && setLightboxOpen(true)}
         >
-          <img
-            key={currentImage}
-            src={currentImage}
-            alt={`${title} - Görsel ${activeIndex + 1}`}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-            loading="lazy"
-          />
+          {!imgError ? (
+            <img
+              key={currentImage}
+              src={currentImage}
+              alt={`${title} - Görsel ${activeIndex + 1}`}
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              loading="eager"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-6 text-center text-[var(--color-text-muted)]">
+              <div className="w-12 h-12 rounded-2xl bg-[#cc1616]/10 text-[#cc1616] flex items-center justify-center mb-2">
+                {fallbackIcon || <ImageIcon size={28} />}
+              </div>
+              <p className="text-xs font-semibold">Görsel Yüklenemedi</p>
+            </div>
+          )}
 
           {/* Alt hafif degrade - yazılar ve ikonlar için */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
