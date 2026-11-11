@@ -107,28 +107,90 @@ export default function Management() {
       }}
     >
       <div className="container-custom relative z-10 w-full">
-        {/* Bölüm Başlığı */}
-        <div className="w-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto mb-16 px-4">
+        {/* Bölüm Başlığı - Tam Genişlik ve Kesin Merkez */}
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            marginBottom: '3.5rem',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
           {/* Eyebrow - İki Yandan Eşit Çizgili & Kusursuz Ortalanmış */}
-          <div className="flex items-center justify-center gap-2.5 mb-3">
-            <span className="h-px w-8 bg-red-600/70" />
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.25em] text-red-600 font-['Oswald']">
-              <Shield className="w-3.5 h-3.5 text-red-600 shrink-0" />
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.625rem',
+              marginBottom: '0.75rem',
+            }}
+          >
+            <span style={{ height: '1px', width: '2rem', backgroundColor: 'rgba(204, 22, 22, 0.7)' }} />
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.25em',
+                color: '#cc1616',
+                fontFamily: "'Oswald', sans-serif",
+              }}
+            >
+              <Shield style={{ width: '0.875rem', height: '0.875rem', color: '#cc1616', flexShrink: 0 }} />
               TEŞKİLAT YAPISI
             </span>
-            <span className="h-px w-8 bg-red-600/70" />
+            <span style={{ height: '1px', width: '2rem', backgroundColor: 'rgba(204, 22, 22, 0.7)' }} />
           </div>
 
           {/* Ana Başlık */}
-          <h2 className="font-['Oswald'] font-bold text-3xl sm:text-4xl lg:text-5xl uppercase tracking-wide text-[var(--color-text-primary)] text-center w-full leading-tight">
+          <h2
+            style={{
+              fontFamily: "'Oswald', sans-serif",
+              fontWeight: 700,
+              fontSize: 'clamp(2rem, 4vw, 3.2rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+              color: 'var(--color-text-primary)',
+              textAlign: 'center',
+              width: '100%',
+              lineHeight: 1.15,
+              margin: '0 auto',
+            }}
+          >
             YÖNETİM KADROSU
           </h2>
 
           {/* Ortalanmış Kırmızı Çizgi */}
-          <div className="w-20 h-1 bg-red-600 mx-auto my-4 rounded-full" />
+          <div
+            style={{
+              width: '5rem',
+              height: '4px',
+              backgroundColor: '#cc1616',
+              borderRadius: '9999px',
+              margin: '1rem auto',
+            }}
+          />
 
           {/* Açıklama Metni */}
-          <p className="text-[var(--color-text-secondary)] text-sm sm:text-base leading-relaxed text-center max-w-xl mx-auto">
+          <p
+            style={{
+              color: 'var(--color-text-secondary)',
+              fontSize: '0.95rem',
+              lineHeight: 1.7,
+              textAlign: 'center',
+              maxWidth: '36rem',
+              margin: '0 auto',
+            }}
+          >
             Kayseri Turancı Dernekler Birliği İl Yönetim Kurulu ve Teşkilat Kadrosu
           </p>
         </div>
