@@ -108,16 +108,27 @@ export default function Management() {
     >
       <div className="container-custom relative z-10 w-full">
         {/* Bölüm Başlığı */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="section-eyebrow justify-center">
-            <Shield className="w-4 h-4 text-red-600 mr-1" />
-            TEŞKİLAT YAPISI
+        <div className="w-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto mb-16 px-4">
+          {/* Eyebrow - İki Yandan Eşit Çizgili & Kusursuz Ortalanmış */}
+          <div className="flex items-center justify-center gap-2.5 mb-3">
+            <span className="h-px w-8 bg-red-600/70" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.25em] text-red-600 font-['Oswald']">
+              <Shield className="w-3.5 h-3.5 text-red-600 shrink-0" />
+              TEŞKİLAT YAPISI
+            </span>
+            <span className="h-px w-8 bg-red-600/70" />
           </div>
-          <h2 className="section-title uppercase tracking-wide">
+
+          {/* Ana Başlık */}
+          <h2 className="font-['Oswald'] font-bold text-3xl sm:text-4xl lg:text-5xl uppercase tracking-wide text-[var(--color-text-primary)] text-center w-full leading-tight">
             YÖNETİM KADROSU
           </h2>
+
+          {/* Ortalanmış Kırmızı Çizgi */}
           <div className="w-20 h-1 bg-red-600 mx-auto my-4 rounded-full" />
-          <p className="text-[var(--color-text-secondary)] text-sm sm:text-base leading-relaxed">
+
+          {/* Açıklama Metni */}
+          <p className="text-[var(--color-text-secondary)] text-sm sm:text-base leading-relaxed text-center max-w-xl mx-auto">
             Kayseri Turancı Dernekler Birliği İl Yönetim Kurulu ve Teşkilat Kadrosu
           </p>
         </div>
