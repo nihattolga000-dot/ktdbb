@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, 
   Calendar, 
@@ -19,6 +19,7 @@ import { parseImageUrls } from "../utils/imageUtils";
 
 export default function NewsDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [news, setNews] = useState<any>(null);
   const [otherNews, setOtherNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,22 +114,43 @@ export default function NewsDetail() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-[#cc1616]/10 via-[#cc1616]/3 to-transparent blur-[120px] rounded-full" />
       </div>
 
-      <main className="relative z-10 max-w-7xl mx-auto pt-28 sm:pt-32 lg:pt-36 pb-20 px-4 sm:px-6 lg:px-8">
-        
-        {/* BREADCRUMB & GERİ DÖNÜŞ ÇUBUĞU */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-[var(--color-border)]">
-          <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
-            <Link to="/" className="hover:text-[#cc1616] transition-colors font-medium">
-              Ana Sayfa
-            </Link>
-            <ChevronRight size={14} className="opacity-50" />
-            <Link to="/#haberler" className="hover:text-[#cc1616] transition-colors font-medium">
-              Haberler
-            </Link>
-            <ChevronRight size={14} className="opacity-50" />
-            <span className="text-[var(--color-text-primary)] font-semibold truncate max-w-[160px] sm:max-w-xs">
-              {news.title}
-            </span>
+      <main
+        className="relative z-10 max-w-7xl mx-auto pb-20 px-4 sm:px-6 lg:px-8"
+        style={{ paddingTop: 'clamp(120px, 14vw, 160px)' }}
+      >
+        {/* ÜST GEZİNTİ & BELİRGİN GERİ DÖN BARI */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--color-border)]">
+          <div className="flex items-center gap-3">
+            {/* Belirgin Geri Tuşu */}
+            <button
+              onClick={() => {
+                if (window.history.length > 1) {
+                  navigate(-1);
+                } else {
+                  navigate('/#haberler');
+                }
+              }}
+              className="inline-flex items-center gap-2 py-2 px-4 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text-primary)] hover:border-[#cc1616] hover:text-[#cc1616] transition-all shadow-sm active:scale-95 cursor-pointer"
+              title="Önceki Sayfaya Geri Dön"
+            >
+              <ArrowLeft size={16} />
+              <span>Geri Dön</span>
+            </button>
+
+            {/* Breadcrumb */}
+            <div className="hidden sm:flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
+              <Link to="/" className="hover:text-[#cc1616] transition-colors font-medium">
+                Ana Sayfa
+              </Link>
+              <ChevronRight size={14} className="opacity-50" />
+              <Link to="/#haberler" className="hover:text-[#cc1616] transition-colors font-medium">
+                Haberler
+              </Link>
+              <ChevronRight size={14} className="opacity-50" />
+              <span className="text-[var(--color-text-primary)] font-semibold truncate max-w-[200px]">
+                {news.title}
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -140,13 +162,6 @@ export default function NewsDetail() {
               {copied ? <Check size={14} className="text-emerald-500" /> : <Share2 size={14} />}
               <span>{copied ? "Kopyalandı!" : "Paylaş"}</span>
             </button>
-
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 py-2 px-3.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all shadow-sm active:scale-95"
-            >
-              <ArrowLeft size={14} /> <span>Geri</span>
-            </Link>
           </div>
         </div>
 
