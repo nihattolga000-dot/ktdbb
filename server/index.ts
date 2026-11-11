@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -31,6 +32,99 @@ const prisma = new PrismaClient({ adapter });
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret-key-change-this-in-production';
 
+// Production Güvenlik Uyarısı
+if (process.env.NODE_ENV === 'production' && JWT_SECRET === 'secret-key-change-this-in-production') {
+  console.warn('[SECURITY CRITICAL] Lütfen .env dosyasında güçlü bir JWT_SECRET belirleyiniz!');
+}
+
+// ─────────────────────────────────────────────
+// GÜVENLİK KATMANI 1: HTTP Security Headers
+// ─────────────────────────────────────────────
+app.disable('x-powered-by'); // Sunucu teknolojisini saldırganlara ifşa etmez
+
+app.use((req, res, next) => {
+  // Clickjacking saldırılarına karşı sayfayı iframe içinde gömmeyi engeller
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  // Tarayıcının MIME türlerini tahmin edip zararlı kod çalıştırmasını (MIME sniffing) engeller
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  // XSS saldırılarına karşı tarayıcı filtresini zorunlu kılar
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  // Güvenli yönlendirme (referrer sızıntısı önleme)
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
+
+// ─────────────────────────────────────────────
+// GÜVENLİK KATMANI 2: In-Memory Sliding Window Rate Limiter (Brute-Force & DoS Koruması)
+// ─────────────────────────────────────────────
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+}
+const rateLimitStore = new Map<string, RateLimitEntry>();
+
+// Bellek temizliği (Memory leak önleme)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimitStore.entries()) {
+    if (now > entry.resetTime) {
+      rateLimitStore.delete(key);
+    }
+  }
+}, 60000);
+
+const createRateLimiter = (options: { windowMs: number; max: number; message: string }) => {
+  return (req: any, res: any, next: any) => {
+    const rawIp = req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || req.socket.remoteAddress || 'unknown-ip';
+    const key = `${req.baseUrl || req.path}:${rawIp}`;
+    const now = Date.now();
+
+    const entry = rateLimitStore.get(key);
+    if (!entry || now > entry.resetTime) {
+      rateLimitStore.set(key, { count: 1, resetTime: now + options.windowMs });
+      return next();
+    }
+
+    if (entry.count >= options.max) {
+      const retryAfterSec = Math.ceil((entry.resetTime - now) / 1000);
+      res.setHeader('Retry-After', retryAfterSec);
+      return res.status(429).json({ error: options.message, retryAfter: retryAfterSec });
+    }
+
+    entry.count += 1;
+    next();
+  };
+};
+
+// Login için sıkı kaba kuvvet (brute-force) koruması: 15 dakikada en fazla 6 deneme
+const loginLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 6,
+  message: 'Çok fazla başarısız giriş denemesi. Güvenliğiniz için lütfen 15 dakika sonra tekrar deneyin.',
+});
+
+// Başvuru & formlar için spam koruması: 1 saatte en fazla 10 başvuru
+const formLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: 'Kısa süre içinde çok fazla başvuru gönderildi. Lütfen daha sonra tekrar deneyiniz.',
+});
+
+// HTML Injection & XSS Temizleyici
+function escapeHtml(str: any): string {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 app.use(cors({
   origin: [
     'https://kayseritdb.com.tr',
@@ -40,9 +134,10 @@ app.use(cors({
   ],
   credentials: true,
 }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// DoS saldırılarına karşı JSON ve form veri limiti 10MB'a çekildi
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Ensure uploads directory exists (recursive + absolute path based on __dirname)
 const uploadsDir = path.resolve(__dirname, '..', 'uploads');
@@ -56,19 +151,37 @@ try {
 // Serve static files from uploads
 app.use('/uploads', express.static(uploadsDir));
 
-// Multer: memory storage so we can handle errors and write manually
+// ─────────────────────────────────────────────
+// GÜVENLİK KATMANI 3: Katı Dosya Yükleme Doğrulaması (File Upload Security)
+// ─────────────────────────────────────────────
+const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp']);
+const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  fileFilter: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.has(ext) || !ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      return cb(new Error('Yalnızca güvenli resim dosyaları (.jpg, .jpeg, .png, .webp) yüklenebilir!'));
+    }
+    cb(null, true);
+  },
 });
 
 // --- Authentication Routes ---
 
-// Login
-app.post('/api/auth/login', async (req, res) => {
+// Login (Sıkı Rate Limiting Korumalı)
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
+    return res.status(400).json({ error: 'E-posta ve şifre zorunludur' });
+  }
+
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const trimmedEmail = email.trim().toLowerCase();
+    const user = await prisma.user.findUnique({ where: { email: trimmedEmail } });
     if (!user) {
       return res.status(401).json({ error: 'Geçersiz e-posta veya şifre' });
     }
@@ -86,7 +199,6 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   } catch (error) {
-    console.error(error);
     console.error('Login error:', error);
     res.status(500).json({ error: 'Sunucu hatası' });
   }
@@ -247,9 +359,11 @@ app.post('/api/upload', authenticate, async (req: any, res: any) => {
       return res.status(400).json({ error: 'Dosya yüklenmedi' });
     }
 
-    // Dosyayı diske yaz
-    const ext = path.extname(req.file.originalname) || '.jpg';
-    const filename = `image-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    // Dosyayı diske yaz (Güvenli uzantı ve tahmin edilemez kriptografik isim)
+    const rawExt = path.extname(req.file.originalname).toLowerCase();
+    const safeExt = ALLOWED_EXTENSIONS.has(rawExt) ? rawExt : '.jpg';
+    const randomHash = crypto.randomBytes(16).toString('hex');
+    const filename = `img-${Date.now()}-${randomHash}${safeExt}`;
     const filepath = path.join(uploadsDir, filename);
 
     console.log('[UPLOAD] Writing file to:', filepath);
@@ -436,25 +550,36 @@ app.get('/api/events/:id', async (req, res) => {
   }
 });
 
-app.post('/api/events/:id/register', async (req, res) => {
+app.post('/api/events/:id/register', formLimiter, async (req, res) => {
   const { name, phone, email } = req.body;
   const eventId = req.params.id;
+
+  if (!name || !phone || !email || typeof name !== 'string' || typeof phone !== 'string' || typeof email !== 'string') {
+    return res.status(400).json({ error: 'Lütfen tüm alanları geçerli şekilde doldurun' });
+  }
+
+  // Temel E-posta ve telefon uzunluk kontrolü
+  const trimmedEmail = email.trim();
+  const trimmedName = name.trim();
+  const trimmedPhone = phone.trim();
+
+  if (trimmedName.length < 2 || trimmedName.length > 100) {
+    return res.status(400).json({ error: 'Geçersiz isim uzunluğu' });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    return res.status(400).json({ error: 'Geçersiz e-posta formatı' });
+  }
+
   try {
     // Check if event exists
     const event = await prisma.event.findUnique({ where: { id: eventId } });
     if (!event) return res.status(404).json({ error: 'Etkinlik bulunamadı' });
 
-    // Validate fields
-    if (!name || !phone || !email) {
-      return res.status(400).json({ error: 'Lütfen tüm alanları doldurun' });
-    }
-
     const registration = await prisma.eventRegistration.create({
-      data: { eventId, name, phone, email }
+      data: { eventId, name: trimmedName, phone: trimmedPhone, email: trimmedEmail }
     });
     res.json(registration);
   } catch (error) {
-    console.error(error);
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Başvuru alınamadı' });
   }
@@ -570,47 +695,61 @@ app.delete('/api/projects/:id', authenticate, requireEventComm, async (req, res)
 });
 
 // --- Membership Applications ---
-app.post('/api/applications', async (req, res) => {
+app.post('/api/applications', formLimiter, async (req, res) => {
   const data = req.body;
+
+  if (!data || !data.name || !data.email || !data.phone) {
+    return res.status(400).json({ error: 'İsim, e-posta ve telefon zorunludur' });
+  }
+
+  const cleanName = escapeHtml(String(data.name).trim().slice(0, 100));
+  const cleanEmail = String(data.email).trim().toLowerCase();
+  const cleanPhone = escapeHtml(String(data.phone).trim().slice(0, 30));
+  const cleanMessage = escapeHtml(String(data.message || '').slice(0, 2000));
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    return res.status(400).json({ error: 'Geçersiz e-posta adresi' });
+  }
+
   try {
     const application = await prisma.membershipApplication.create({
       data: {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        message: data.message,
-        birthDate: data.birthDate || '',
-        livesInKayseri: data.livesInKayseri || '',
-        education: data.education || '',
-        ideology: data.ideology || '',
-        politicalParty: data.politicalParty || '',
-        definitionTurkculuk: data.definitionTurkculuk || '',
-        turanMeaning: data.turanMeaning || '',
-        reasonToJoin: data.reasonToJoin || '',
-        favoriteLeader: data.favoriteLeader || '',
+        name: cleanName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        message: cleanMessage,
+        birthDate: escapeHtml(String(data.birthDate || '').slice(0, 50)),
+        livesInKayseri: escapeHtml(String(data.livesInKayseri || '').slice(0, 50)),
+        education: escapeHtml(String(data.education || '').slice(0, 100)),
+        ideology: escapeHtml(String(data.ideology || '').slice(0, 100)),
+        politicalParty: escapeHtml(String(data.politicalParty || '').slice(0, 100)),
+        definitionTurkculuk: escapeHtml(String(data.definitionTurkculuk || '').slice(0, 1000)),
+        turanMeaning: escapeHtml(String(data.turanMeaning || '').slice(0, 1000)),
+        reasonToJoin: escapeHtml(String(data.reasonToJoin || '').slice(0, 1000)),
+        favoriteLeader: escapeHtml(String(data.favoriteLeader || '').slice(0, 100)),
         status: 'PENDING'
       }
     });
 
-    // Notify Admin
+    // Notify Admin (HTML Injection korumalı)
     try {
       await transporter.sendMail({
         from: process.env.SMTP_USER,
         to: process.env.SMTP_USER, // Send to admin email
-        subject: `Yeni Üyelik Başvurusu: ${data.name}`,
-        html: `<p><b>İsim:</b> ${data.name}</p>
-               <p><b>E-posta:</b> ${data.email}</p>
-               <p><b>Telefon:</b> ${data.phone}</p>
-               ${data.birthDate ? `<p><b>Doğum Tarihi:</b> ${data.birthDate}</p>` : ''}
-               ${data.livesInKayseri ? `<p><b>Kayseri'de mi yaşıyor?:</b> ${data.livesInKayseri}</p>` : ''}
-               ${data.education ? `<p><b>Eğitim Durumu:</b> ${data.education}</p>` : ''}
-               ${data.ideology ? `<p><b>İdeolojik Görüş:</b> ${data.ideology}</p>` : ''}
-               ${data.politicalParty ? `<p><b>Siyasi Parti Üyeliği:</b> ${data.politicalParty}</p>` : ''}
-               ${data.favoriteLeader ? `<p><b>En Beğendiği Lider:</b> ${data.favoriteLeader}</p>` : ''}
-               ${data.definitionTurkculuk ? `<p><b>Türkçülüğün Tanımı:</b> ${data.definitionTurkculuk}</p>` : ''}
-               ${data.turanMeaning ? `<p><b>Turan Ne Demek:</b> ${data.turanMeaning}</p>` : ''}
-               ${data.reasonToJoin ? `<p><b>Katılma Sebebi:</b> ${data.reasonToJoin}</p>` : ''}
-               <p><b>Eklenen Mesaj:</b><br/> ${data.message}</p>
+        subject: `Yeni Üyelik Başvurusu: ${cleanName}`,
+        html: `<p><b>İsim:</b> ${cleanName}</p>
+               <p><b>E-posta:</b> ${cleanEmail}</p>
+               <p><b>Telefon:</b> ${cleanPhone}</p>
+               ${data.birthDate ? `<p><b>Doğum Tarihi:</b> ${escapeHtml(String(data.birthDate))}</p>` : ''}
+               ${data.livesInKayseri ? `<p><b>Kayseri'de mi yaşıyor?:</b> ${escapeHtml(String(data.livesInKayseri))}</p>` : ''}
+               ${data.education ? `<p><b>Eğitim Durumu:</b> ${escapeHtml(String(data.education))}</p>` : ''}
+               ${data.ideology ? `<p><b>İdeolojik Görüş:</b> ${escapeHtml(String(data.ideology))}</p>` : ''}
+               ${data.politicalParty ? `<p><b>Siyasi Parti Üyeliği:</b> ${escapeHtml(String(data.politicalParty))}</p>` : ''}
+               ${data.favoriteLeader ? `<p><b>En Beğendiği Lider:</b> ${escapeHtml(String(data.favoriteLeader))}</p>` : ''}
+               ${data.definitionTurkculuk ? `<p><b>Türkçülüğün Tanımı:</b> ${escapeHtml(String(data.definitionTurkculuk))}</p>` : ''}
+               ${data.turanMeaning ? `<p><b>Turan Ne Demek:</b> ${escapeHtml(String(data.turanMeaning))}</p>` : ''}
+               ${data.reasonToJoin ? `<p><b>Katılma Sebebi:</b> ${escapeHtml(String(data.reasonToJoin))}</p>` : ''}
+               <p><b>Eklenen Mesaj:</b><br/> ${cleanMessage}</p>
                <hr/>
                <p>Yönetim panelinden başvuruyu inceleyip onaylayabilirsiniz.</p>`
       });
@@ -620,7 +759,6 @@ app.post('/api/applications', async (req, res) => {
 
     res.json(application);
   } catch (error) {
-    console.error(error);
     console.error('Application create error:', error);
     res.status(500).json({ error: 'Başvuru oluşturulamadı' });
   }

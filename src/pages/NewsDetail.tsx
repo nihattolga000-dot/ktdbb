@@ -8,7 +8,8 @@ import {
   Check, 
   ChevronRight,
   Clock,
-  Sparkles
+  Sparkles,
+  Bookmark
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -112,10 +113,10 @@ export default function NewsDetail() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-[#cc1616]/10 via-[#cc1616]/3 to-transparent blur-[120px] rounded-full" />
       </div>
 
-      <main className="relative z-10 max-w-7xl mx-auto pt-32 sm:pt-36 pb-20 px-4 sm:px-6 lg:px-8">
+      <main className="relative z-10 max-w-7xl mx-auto pt-28 sm:pt-32 lg:pt-36 pb-20 px-4 sm:px-6 lg:px-8">
         
         {/* BREADCRUMB & GERİ DÖNÜŞ ÇUBUĞU */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--color-border)]">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
             <Link to="/" className="hover:text-[#cc1616] transition-colors font-medium">
               Ana Sayfa
@@ -125,7 +126,7 @@ export default function NewsDetail() {
               Haberler
             </Link>
             <ChevronRight size={14} className="opacity-50" />
-            <span className="text-[var(--color-text-primary)] font-semibold truncate max-w-[200px] sm:max-w-xs">
+            <span className="text-[var(--color-text-primary)] font-semibold truncate max-w-[160px] sm:max-w-xs">
               {news.title}
             </span>
           </div>
@@ -149,11 +150,31 @@ export default function NewsDetail() {
           </div>
         </div>
 
-        {/* ANA İKİLİ IZGARA (Layout) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* FULL-WIDTH HEADER ALANI (Mobilde ve Masaüstünde En Başta Başlık ve Meta) */}
+        <div className="mb-8 sm:mb-10">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-3.5">
+            <span className="inline-flex items-center gap-2 bg-[#cc1616]/10 border border-[#cc1616]/25 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
+              <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
+              KTDB GÜNDEM
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] font-medium">
+              <Calendar size={13} className="text-[#cc1616]" /> {dateStr}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] font-medium">
+              <Clock size={13} className="text-[#cc1616]" /> ~{readTime} dk okuma
+            </span>
+          </div>
+
+          <h1 className="font-['Oswald'] text-2xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[var(--color-text-primary)] leading-[1.15] break-words">
+            {news.title}
+          </h1>
+        </div>
+
+        {/* ANA İKİLİ IZGARA (Layout: Sol 8 Kolon İçerik, Sağ 4 Kolon Sticky Künye) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           
-          {/* SOL SÜTUN: GÖRSEL / GALERİ & HABER BİLGİ KARTI (lg:col-span-5) */}
-          <div className="lg:col-span-5 w-full flex flex-col gap-6 lg:sticky lg:top-28">
+          {/* SOL SÜTUN (lg:col-span-8): GALERİ & HABER METNİ */}
+          <div className="lg:col-span-8 w-full flex flex-col gap-6 sm:gap-8">
             <ImageGalleryViewer
               images={images}
               title={news.title}
@@ -161,8 +182,57 @@ export default function NewsDetail() {
               fallbackIcon={<Newspaper size={40} />}
             />
 
+            {/* HABER İÇERİK KARTI */}
+            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-lg transition-colors duration-300">
+              <div className="flex items-center gap-3 pb-4 mb-6 border-b border-[var(--color-border)]">
+                <span className="w-8 h-1 bg-[#cc1616] rounded-full" />
+                <h2 className="font-['Oswald'] text-lg uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
+                  Haber Detayları
+                </h2>
+              </div>
+
+              {/* METİN BÖLÜMÜ */}
+              <div className="prose prose-neutral max-w-none text-[var(--color-text-secondary)] leading-relaxed text-sm sm:text-base space-y-5 font-sans break-words">
+                {news.content ? (
+                  news.content.split("\n").map((p: string, i: number) =>
+                    p.trim() ? (
+                      <p key={i} className="text-justify sm:text-left leading-relaxed">
+                        {p}
+                      </p>
+                    ) : null
+                  )
+                ) : (
+                  <p className="text-[var(--color-text-muted)] italic">
+                    Bu haber için henüz detaylı içerik girilmemiştir.
+                  </p>
+                )}
+              </div>
+
+              {/* DİPNOT / BÜLTEN KUTUSU */}
+              <div className="mt-8 pt-6 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--color-bg-elevated)]/40 rounded-2xl p-4 sm:p-5">
+                <div>
+                  <p className="font-['Oswald'] text-sm uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
+                    Kayseri Turancı Dernekler Birliği
+                  </p>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                    Gelişmelerden ve duyurulardan haberdar olmak için çalışmalarımızı takip edin.
+                  </p>
+                </div>
+                <Link
+                  to="/#faaliyetler"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#cc1616] text-white text-xs font-['Oswald'] uppercase tracking-wider font-bold hover:bg-[#a81010] transition-colors shrink-0 shadow-md shadow-[#cc1616]/20"
+                >
+                  Faaliyetlerimizi İncele
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* SAĞ SÜTUN (lg:col-span-4): STICKY HABER KÜNYESİ & HIZLI AKSİYONLAR */}
+          <div className="lg:col-span-4 w-full flex flex-col gap-6 lg:sticky lg:top-28">
+            
             {/* BİLGİ KARTI */}
-            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-3xl p-6 shadow-sm transition-colors duration-300">
+            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm transition-colors duration-300">
               <h3 className="font-['Oswald'] text-sm uppercase tracking-wider text-[var(--color-text-primary)] font-bold mb-4 flex items-center gap-2">
                 <Sparkles size={16} className="text-[#cc1616]" />
                 Haber Bilgileri
@@ -185,6 +255,14 @@ export default function NewsDetail() {
                   </span>
                 </div>
 
+                <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
+                  <span className="text-[var(--color-text-muted)] font-medium">Kategori</span>
+                  <span className="text-[var(--color-text-primary)] font-semibold flex items-center gap-1.5">
+                    <Bookmark size={13} className="text-[#cc1616]" />
+                    Gündem & Basın
+                  </span>
+                </div>
+
                 <div className="flex items-center justify-between">
                   <span className="text-[var(--color-text-muted)] font-medium">Haber Kaynağı</span>
                   <span className="text-[var(--color-text-primary)] font-semibold">
@@ -192,71 +270,34 @@ export default function NewsDetail() {
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* SAĞ SÜTUN: BAŞLIK, ETİKETLER & DETAYLI HABER METNİ (lg:col-span-7) */}
-          <div className="lg:col-span-7 w-full flex flex-col">
-            
-            {/* ETİKETLER */}
-            <div className="flex flex-wrap items-center gap-2.5 mb-4">
-              <span className="inline-flex items-center gap-2 bg-[#cc1616]/10 border border-[#cc1616]/25 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
-                <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
-                KTDB GÜNDEM
-              </span>
-              <span className="inline-flex items-center gap-1 text-[var(--color-text-muted)] text-xs font-medium">
-                <Calendar size={13} /> {dateStr}
-              </span>
+              {/* Paylaş Butonu */}
+              <button
+                onClick={handleShare}
+                className="w-full mt-5 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text-primary)] hover:border-[#cc1616]/50 hover:text-[#cc1616] transition-all cursor-pointer"
+              >
+                {copied ? <Check size={14} className="text-emerald-500" /> : <Share2 size={14} />}
+                <span>{copied ? "Bağlantı Kopyalandı!" : "Bu Haberi Paylaş"}</span>
+              </button>
             </div>
 
-            {/* HABER BAŞLIĞI */}
-            <h1 className="font-['Oswald'] text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[var(--color-text-primary)] leading-[1.12] mb-6 break-words">
-              {news.title}
-            </h1>
-
-            {/* HABER İÇERİK KARTI */}
-            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-3xl p-6 sm:p-10 shadow-lg transition-colors duration-300">
-              <div className="flex items-center gap-3 pb-5 mb-6 border-b border-[var(--color-border)]">
-                <span className="w-8 h-1 bg-[#cc1616] rounded-full" />
-                <h2 className="font-['Oswald'] text-lg uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
-                  Haber Metni
-                </h2>
-              </div>
-
-              {/* METİN BÖLÜMÜ */}
-              <div className="prose prose-neutral max-w-none text-[var(--color-text-secondary)] leading-relaxed text-sm sm:text-base space-y-5 font-sans break-words">
-                {news.content ? (
-                  news.content.split("\n").map((p: string, i: number) =>
-                    p.trim() ? (
-                      <p key={i} className="text-justify sm:text-left leading-relaxed">
-                        {p}
-                      </p>
-                    ) : null
-                  )
-                ) : (
-                  <p className="text-[var(--color-text-muted)] italic">
-                    Bu haber için henüz detaylı içerik girilmemiştir.
-                  </p>
-                )}
-              </div>
-
-              {/* DİPNOT / BÜLTEN KUTUSU */}
-              <div className="mt-8 pt-6 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--color-bg-elevated)]/40 rounded-2xl p-5">
-                <div>
-                  <p className="font-['Oswald'] text-sm uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
-                    Kayseri Turancı Dernekler Birliği
-                  </p>
-                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                    Gelişmelerden ve duyurulardan haberdar olmak için bizi takip edin.
-                  </p>
-                </div>
-                <Link
-                  to="/#faaliyetler"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#cc1616] text-white text-xs font-['Oswald'] uppercase tracking-wider font-bold hover:bg-[#a81010] transition-colors shrink-0"
-                >
-                  Faaliyetlerimizi İncele
-                </Link>
-              </div>
+            {/* HIZLI İLETİŞİM / BİZE KATIL KARTI */}
+            <div className="bg-gradient-to-br from-[#cc1616]/15 via-[var(--color-bg-card)] to-[var(--color-bg-card)] border border-[#cc1616]/20 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm">
+              <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-[#cc1616] mb-2 font-['Oswald']">
+                MİLLİ MÜCADELEDE BİRLİKTEYİZ
+              </span>
+              <h4 className="font-['Oswald'] text-lg font-bold uppercase text-[var(--color-text-primary)] mb-2">
+                Teşkilatımıza Katılın
+              </h4>
+              <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-4">
+                Türk dünyası ve milli davamız uğruna yürüttüğümüz çalışmalarda siz de yerinizi alın.
+              </p>
+              <Link
+                to="/#katil"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#cc1616] text-white text-xs font-['Oswald'] uppercase tracking-wider font-bold hover:bg-[#a81010] shadow-md shadow-[#cc1616]/25 transition-all"
+              >
+                Gönüllü Başvurusu Yap
+              </Link>
             </div>
 
           </div>
@@ -264,7 +305,7 @@ export default function NewsDetail() {
 
         {/* DİĞER HABERLER (ALT ÖNERİ ALANI) */}
         {otherNews.length > 0 && (
-          <div className="mt-20 pt-12 border-t border-[var(--color-border)]">
+          <div className="mt-16 sm:mt-20 pt-10 sm:pt-12 border-t border-[var(--color-border)]">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <span className="text-[#cc1616] font-['Oswald'] text-xs font-bold uppercase tracking-widest">
@@ -291,7 +332,7 @@ export default function NewsDetail() {
                   <Link
                     key={n.id}
                     to={`/haber/${n.id}`}
-                    className="group bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-[#cc1616]/50 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+                    className="group bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-[#cc1616]/50 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
                   >
                     <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-bg-elevated)]">
                       {nCover ? (
@@ -313,7 +354,7 @@ export default function NewsDetail() {
 
                     <div className="p-5 flex-1 flex flex-col justify-between">
                       <div>
-                        <h4 className="font-['Oswald'] text-lg font-bold uppercase tracking-tight text-[var(--color-text-primary)] group-hover:text-[#cc1616] transition-colors line-clamp-2 mb-2">
+                        <h4 className="font-['Oswald'] text-base sm:text-lg font-bold uppercase tracking-tight text-[var(--color-text-primary)] group-hover:text-[#cc1616] transition-colors line-clamp-2 mb-2">
                           {n.title}
                         </h4>
                         <p className="text-xs text-[var(--color-text-muted)] line-clamp-2">

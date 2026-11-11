@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 const faqs = [
   {
     question: 'Turancı Dernekler Birliği nedir ve amacı neyi hedefler?',
-    answer: 'Kayseri Turancı Dernekler Birliği, Türk milletinin birliğini, dirliğini ve Turan ülküsünü savunan derneklerin ortak hareket ettiği bir platformdur. Amacımız, Türk dünyasının kültürel ve entelektüel inşasını sağlamak, milli şuurumuzu gelecek nesillere aktarmak ve milli değerlerimizi korumaktır.',
+    answer: 'Turancı Dernekler Birliği olarak hedefimiz; Türk milletinde millî şuurun güçlenmesini sağlamak, tarihimize ve kültürümüze sahip çıkmak, millî değerlerimizi gelecek nesillere aktarmak ve Türk milletinin toplumsal hayatın her alanında etkin bir konuma ulaşmasına katkıda bulunmaktır. Eğitimden bilime, kültürden sanata, siyasetten diplomasiye kadar her alanda Türk milletinin kendi değerleriyle yetişen, üreten ve söz sahibi olan bir millet olarak varlığını güçlendirmesini amaçlıyoruz. Bu doğrultuda, millî bilinci yüksek, tarihini bilen, geleceğine yön verebilen ve milletine karşı sorumluluk taşıyan nesillerin yetişmesi için çalışıyoruz.',
   },
   {
     question: 'Birliğe katılmak için hangi şartları taşımak gerekir?',
@@ -27,8 +27,8 @@ const faqs = [
     answer: 'Türk milliyetçiliği kalbimizde yanan büyük bir sevdadır ancak kararlarımızda daima "Stratejik Akıl" devrededir. Olaylara anlık heyecanlar veya kışkırtmalarla değil, uzun vadeli tarihsel irademiz ve rasyonel durum analizleriyle yaklaşıyoruz.',
   },
   {
-    question: 'Sizin tanımınıza göre Türk Milliyetçiliği nedir?',
-    answer: 'Türk Milliyetçiliği; Türk milletini bağımsız, güçlü, müreffeh ve çağdaş bir medeniyet seviyesine ulaştırma ülküsüdür. Bu ülkü, geçmişine sadık kalarak aklın ve bilimin ışığında geleceği inşa etmeyi, Türk\'ün öz değerlerini evrensel gelişmelerle harmanlamayı gerektirir.',
+    question: 'Bizim tanımınıza göre Türk Milliyetçiliği nedir?',
+    answer: 'Türk milliyetçiliği, Türk milletinin varlığını, birliğini, bağımsızlığını ve geleceğini esas alan; tarihine, diline, kültürüne ve ortak değerlerine sahip çıkmayı temel sorumluluk kabul eden bir düşünce anlayışıdır. Milletimizin geçmişten devraldığı mirası korumayı, bu mirası çağın ihtiyaçları doğrultusunda geliştirerek gelecek nesillere aktarmayı ve Türk milletinin kendi geleceği üzerinde söz sahibi olmasını savunur. Türk milliyetçiliği, yalnızca geçmişle övünmek değil, geçmişten alınan güçle geleceği inşa etmektir. Akıl ve bilimi rehber edinmeyi, eğitimi ve üretimi geliştirmeyi, adaleti ve liyakati esas almayı, toplumsal dayanışmayı güçlendirmeyi ve Türk milletinin her alanda ilerlemesini hedefler. Millî kimliğin korunması ile çağdaşlaşmanın birbirine karşıt olmadığını; aksine, kendi kimliğinin bilincinde olan bir milletin dünyaya daha güçlü katkılar sunabileceğini kabul eder. Bizim anlayışımıza göre Türk milliyetçiliği, Türk milletine karşı duyulan aidiyetin ve sorumluluğun düşünceye, emeğe ve eyleme dönüşmesidir. Hedefimiz; tarihini bilen, kültürüne sahip çıkan, aklın ve bilimin ışığında ilerleyen, bağımsızlığına sahip çıkan, adaleti ve toplumsal refahı önemseyen, dünyada saygın ve etkin bir konuma sahip olan bir Türk milletinin geleceğine katkıda bulunmaktır.',
   },
   {
     question: '"Mevcut meselelere Türk ağzıyla bakmak" ne anlama gelir?',
@@ -37,6 +37,10 @@ const faqs = [
   {
     question: 'Birliğe destek vermek için illa bir derneğe üye olmak mı gerekir?',
     answer: 'Resmi üyelik gücümüze güç katsa da zorunlu değildir. Üye olmadan da etkinliklerimize ve seminerlerimize katılabilir, fikirlerimizi yayabilir ve Turan ülküsüne bulunduğunuz her mecrada (okulda, iş yerinde, sosyal medyada) destek verebilirsiniz.',
+  },
+  {
+    question: 'Bizim Turan anlayışımız nedir?',
+    answer: 'Bizim Turan anlayışımız, Türk devletleri ve toplulukları arasında ortak tarihimizden, dilimizden ve kültürümüzden doğan bağları güçlendirerek kalıcı bir birlik oluşturmaktır. Türk dünyasının yalnızca kültürel yakınlıkla yetinmeyen; ekonomik, siyasi, bilimsel ve diplomatik alanlarda da iş birliği yapan, ortak meseleler karşısında birlikte hareket edebilen bir yapıya kavuşmasını savunuyoruz. Amacımız, Türk devletlerinin bağımsızlıklarına ve egemenliklerine saygı temelinde, kendi iradeleriyle ortak hedefler doğrultusunda hareket etmeleri ve uluslararası alanda daha güçlü bir konuma ulaşmalarıdır. Çünkü inanıyoruz ki Türk dünyasının sahip olduğu potansiyel, dayanışma ve iş birliğiyle çok daha ileriye taşınabilir.'
   },
 ];
 

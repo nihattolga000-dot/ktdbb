@@ -15,40 +15,52 @@ export default function Hero() {
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
-        background: 'var(--color-bg-primary)', // Deep dark reddish black
+        background: '#09090b', // Sinematik koyu zemin (açık temada solmayı engeller)
         overflow: 'hidden',
       }}
     >
-      {/* Background Image - Ancient Turkic Warrior */}
+      {/* Background Image - Mustafa Kemal Atatürk Kalpaklı Canlı Gözleri (4K Responsive) */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <img
-          src="/images/hero-bg.jpg"
-          alt="Turkic Warrior"
-          className="w-full h-full object-cover object-[35%_center] md:object-center"
+          src="/images/ataturk-kalpak-eyes.jpg"
+          alt="Gazi Mustafa Kemal Atatürk Gözleri"
+          className="w-full h-full object-cover object-[50%_18%] sm:object-[45%_25%] md:object-[35%_center] lg:object-[28%_center]"
           style={{
-            opacity: 0.65,
-            filter: 'contrast(110%) saturate(120%)',
+            opacity: 0.95,
+            filter: 'contrast(115%) saturate(125%) brightness(96%)',
           }}
           loading="eager"
         />
-        {/* Dark gradient overlay to ensure text readability on the right side */}
+
+        {/* Masaüstünde sağdan sola karartma (Metinlerin arkasını kusursuz koyulaştırır) */}
         <div
+          className="hidden md:block absolute inset-0 pointer-events-none"
           style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to left, color-mix(in srgb, var(--color-bg-primary) 95%, transparent) 0%, color-mix(in srgb, var(--color-bg-primary) 70%, transparent) 40%, transparent 100%)',
+            background:
+              'linear-gradient(to left, rgba(9,9,11,0.98) 0%, rgba(9,9,11,0.85) 45%, rgba(9,9,11,0.2) 75%, transparent 100%)',
           }}
         />
+
+        {/* Mobilde yukarıdan aşağıya karartma (Gözler üstte parlar, alt kısımdaki metinler koyu zeminde net okunur) */}
         <div
+          className="md:hidden absolute inset-0 pointer-events-none"
           style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to top, color-mix(in srgb, var(--color-bg-primary) 100%, transparent) 0%, rgba(10,5,5,0) 25%)',
+            background:
+              'linear-gradient(to top, rgba(9,9,11,0.98) 0%, rgba(9,9,11,0.92) 55%, rgba(9,9,11,0.2) 85%, transparent 100%)',
+          }}
+        />
+
+        {/* Üst ve alt yumuşak kenar geçişleri */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(9,9,11,0.7) 0%, transparent 20%, transparent 80%, #09090b 100%)',
           }}
         />
       </div>
 
-      <div className="container-custom relative z-10 w-full" style={{ paddingTop: '6rem', paddingBottom: '4rem' }}>
+      <div className="container-custom relative z-10 w-full pt-36 sm:pt-32 md:pt-20 lg:pt-0 pb-16 md:pb-12">
         <div className="grid lg:grid-cols-12 gap-8 items-center">
 
           {/* Left Side: Empty to showcase the warrior */}
@@ -89,15 +101,15 @@ export default function Hero() {
               }}
               className="items-center lg:items-end"
             >
-              <span style={{ color: 'var(--color-text-primary)', textShadow: '0 10px 30px color-mix(in srgb, var(--color-bg-primary) 80%, transparent)' }}>YURTTA SULH,</span>
+              <span style={{ color: '#ffffff', textShadow: '0 10px 30px rgba(0,0,0,0.8)' }}>YA İSTİKLAL,</span>
               <span
                 style={{
                   color: 'transparent',
                   WebkitTextStroke: '2px #cc1616',
-                  filter: 'drop-shadow(0 0 15px rgba(204,22,22,0.4))',
+                  filter: 'drop-shadow(0 0 15px rgba(204,22,22,0.5))',
                 }}
               >
-                CİHANDA SULH!
+                YA ÖLÜM!
               </span>
             </h1>
 
@@ -105,17 +117,17 @@ export default function Hero() {
             <p
               style={{
                 fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-                color: 'var(--color-text-secondary)',
+                color: 'rgba(255, 255, 255, 0.82)',
                 lineHeight: 1.8,
                 marginBottom: '3rem',
                 maxWidth: '600px',
                 fontWeight: 400,
-                textShadow: '0 2px 10px color-mix(in srgb, var(--color-bg-primary) 80%, transparent)',
+                textShadow: '0 2px 10px rgba(0,0,0,0.8)',
               }}
               className="border-r-0 lg:border-r-2 lg:pr-6 border-red-600/50 italic"
             >
               "Muhtaç olduğun kudret, damarlarındaki asil kanda mevcuttur!"
-              <br/>
+              <br />
               <span className="text-sm text-red-500 font-bold mt-2 block not-italic">— Mustafa Kemal Atatürk</span>
             </p>
 
@@ -162,9 +174,9 @@ export default function Hero() {
                   alignItems: 'center',
                   gap: '0.75rem',
                   padding: '1.1rem 2.5rem',
-                  background: 'color-mix(in srgb, var(--color-bg-card) 40%, transparent)',
-                  color: 'var(--color-text-primary)',
-                  border: '1px solid var(--color-border)',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
                   borderRadius: '2px',
                   fontSize: '0.85rem',
                   fontWeight: 700,
@@ -175,13 +187,13 @@ export default function Hero() {
                   backdropFilter: 'blur(10px)',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-border)';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-text-muted)';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 255, 255, 0.18)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255, 255, 255, 0.4)';
                   (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'color-mix(in srgb, var(--color-bg-card) 40%, transparent)';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-border-light)';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 255, 255, 0.08)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255, 255, 255, 0.2)';
                   (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
                 }}
               >
@@ -217,12 +229,12 @@ export default function Hero() {
       </div>
 
       {/* Turkic Quotes - Absolute Bottom Left */}
-      <div 
-        className="hidden lg:block z-30" 
-        style={{ 
-          position: 'absolute', 
-          bottom: '2rem', 
-          left: '2rem' 
+      <div
+        className="hidden lg:block z-30"
+        style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '2rem'
         }}
       >
         <TurkicThinkers />

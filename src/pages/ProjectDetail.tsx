@@ -6,43 +6,16 @@ import {
   Activity, 
   Share2, 
   Check, 
-  Sparkles, 
-  ChevronRight,
-  FolderGit2
+  ChevronRight, 
+  Sparkles,
+  FolderGit2,
+  Building2
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ImageGalleryViewer from "../components/ImageGalleryViewer";
 import { API_BASE_URL } from "../data/config";
 import { parseImageUrls } from "../utils/imageUtils";
-
-function getStatus(s: string) {
-  if (s === "ONGOING") {
-    return {
-      label: "Devam Ediyor",
-      color: "#16a34a",
-      bg: "rgba(22, 163, 74, 0.12)",
-      border: "rgba(22, 163, 74, 0.28)",
-      dotColor: "#22c55e"
-    };
-  }
-  if (s === "COMPLETED") {
-    return {
-      label: "Tamamlandı",
-      color: "#2563eb",
-      bg: "rgba(37, 99, 235, 0.12)",
-      border: "rgba(37, 99, 235, 0.28)",
-      dotColor: "#3b82f6"
-    };
-  }
-  return {
-    label: "Planlanıyor",
-    color: "#d97706",
-    bg: "rgba(217, 119, 6, 0.12)",
-    border: "rgba(217, 119, 6, 0.28)",
-    dotColor: "#f59e0b"
-  };
-}
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -80,6 +53,44 @@ export default function ProjectDetail() {
       navigator.clipboard.writeText(window.location.href);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  const getStatus = (s: string) => {
+    switch (s) {
+      case "COMPLETED":
+        return { 
+          label: "Tamamlandı", 
+          bg: "rgba(16, 185, 129, 0.12)", 
+          border: "rgba(16, 185, 129, 0.3)", 
+          color: "#10b981",
+          dotColor: "#10b981"
+        };
+      case "ACTIVE":
+      case "DEVAM_EDIYOR":
+        return { 
+          label: "Devam Ediyor", 
+          bg: "rgba(59, 130, 246, 0.12)", 
+          border: "rgba(59, 130, 246, 0.3)", 
+          color: "#3b82f6",
+          dotColor: "#3b82f6"
+        };
+      case "PLANNED":
+        return { 
+          label: "Planlanıyor", 
+          bg: "rgba(245, 158, 11, 0.12)", 
+          border: "rgba(245, 158, 11, 0.3)", 
+          color: "#f59e0b",
+          dotColor: "#f59e0b"
+        };
+      default:
+        return { 
+          label: "Aktif Proje", 
+          bg: "rgba(204, 22, 22, 0.12)", 
+          border: "rgba(204, 22, 22, 0.3)", 
+          color: "#cc1616",
+          dotColor: "#cc1616"
+        };
     }
   };
 
@@ -132,15 +143,15 @@ export default function ProjectDetail() {
     <div className="bg-[var(--color-bg-primary)] min-h-screen text-[var(--color-text-primary)] selection:bg-[#cc1616] selection:text-white transition-colors duration-300">
       <Navbar />
 
-      {/* AMBIENT BACKGROUND GLOW (Açık ve Koyu Temada Premium Atmosfer) */}
+      {/* AMBIENT BACKGROUND GLOW */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-[#cc1616]/10 via-[#cc1616]/3 to-transparent blur-[120px] rounded-full" />
       </div>
 
-      <main className="relative z-10 max-w-7xl mx-auto pt-32 sm:pt-36 pb-20 px-4 sm:px-6 lg:px-8">
+      <main className="relative z-10 max-w-7xl mx-auto pt-28 sm:pt-32 lg:pt-36 pb-20 px-4 sm:px-6 lg:px-8">
         
         {/* BREADCRUMB & GERİ DÖNÜŞ ÇUBUĞU */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-[var(--color-border)]">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
             <Link to="/" className="hover:text-[#cc1616] transition-colors font-medium">
               Ana Sayfa
@@ -150,7 +161,7 @@ export default function ProjectDetail() {
               Projeler
             </Link>
             <ChevronRight size={14} className="opacity-50" />
-            <span className="text-[var(--color-text-primary)] font-semibold truncate max-w-[200px] sm:max-w-xs">
+            <span className="text-[var(--color-text-primary)] font-semibold truncate max-w-[160px] sm:max-w-xs">
               {project.title}
             </span>
           </div>
@@ -174,11 +185,35 @@ export default function ProjectDetail() {
           </div>
         </div>
 
-        {/* ANA İKİLİ IZGARA (Layout) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* FULL-WIDTH HEADER ALANI (Mobilde ve Masaüstünde En Başta Başlık ve Meta) */}
+        <div className="mb-8 sm:mb-10">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-3.5">
+            <span className="inline-flex items-center gap-2 bg-[#cc1616]/10 border border-[#cc1616]/25 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
+              <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
+              KTDB PROJESİ
+            </span>
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-wider uppercase font-['Oswald']"
+              style={{ background: st.bg, border: `1px solid ${st.border}`, color: st.color }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: st.dotColor }} />
+              {st.label}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] font-medium">
+              <Calendar size={13} className="text-[#cc1616]" /> {dateStr}
+            </span>
+          </div>
+
+          <h1 className="font-['Oswald'] text-2xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[var(--color-text-primary)] leading-[1.15] break-words">
+            {project.title}
+          </h1>
+        </div>
+
+        {/* ANA İKİLİ IZGARA (Layout: Sol 8 Kolon İçerik, Sağ 4 Kolon Sticky Künye) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           
-          {/* SOL SÜTUN: GÖRSEL / GALERİ & PROJE ÖZET BİLGİLERİ (lg:col-span-5) */}
-          <div className="lg:col-span-5 w-full flex flex-col gap-6 lg:sticky lg:top-28">
+          {/* SOL SÜTUN (lg:col-span-8): GALERİ & PROJE AÇIKLAMASI */}
+          <div className="lg:col-span-8 w-full flex flex-col gap-6 sm:gap-8">
             <ImageGalleryViewer
               images={images}
               title={project.title}
@@ -186,8 +221,57 @@ export default function ProjectDetail() {
               fallbackIcon={<FolderGit2 size={40} />}
             />
 
+            {/* PROJE AÇIKLAMASI (İÇERİK KARTI) */}
+            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-lg transition-colors duration-300">
+              <div className="flex items-center gap-3 pb-4 mb-6 border-b border-[var(--color-border)]">
+                <span className="w-8 h-1 bg-[#cc1616] rounded-full" />
+                <h2 className="font-['Oswald'] text-lg uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
+                  Proje Kapsamı ve Raporu
+                </h2>
+              </div>
+
+              {/* METİN BÖLÜMÜ */}
+              <div className="prose prose-neutral max-w-none text-[var(--color-text-secondary)] leading-relaxed text-sm sm:text-base space-y-5 font-sans break-words">
+                {project.description ? (
+                  project.description.split("\n").map((p: string, i: number) =>
+                    p.trim() ? (
+                      <p key={i} className="text-justify sm:text-left leading-relaxed">
+                        {p}
+                      </p>
+                    ) : null
+                  )
+                ) : (
+                  <p className="text-[var(--color-text-muted)] italic">
+                    Bu proje hakkında detaylı açıklama metni henüz eklenmemiştir.
+                  </p>
+                )}
+              </div>
+
+              {/* DİPNOT / DAYANIŞMA METNİ */}
+              <div className="mt-8 pt-6 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--color-bg-elevated)]/40 rounded-2xl p-4 sm:p-5">
+                <div>
+                  <p className="font-['Oswald'] text-sm uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
+                    Turan Ülküsü İçin Çalışıyoruz
+                  </p>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                    Projelerimize katılmak veya destek vermek için teşkilatımızla iletişime geçebilirsiniz.
+                  </p>
+                </div>
+                <Link
+                  to="/#iletisim"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#cc1616] text-white text-xs font-['Oswald'] uppercase tracking-wider font-bold hover:bg-[#a81010] transition-colors shrink-0 shadow-md shadow-[#cc1616]/20"
+                >
+                  İletişime Geç
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* SAĞ SÜTUN (lg:col-span-4): STICKY PROJE KÜNYESİ & HIZLI AKSİYONLAR */}
+          <div className="lg:col-span-4 w-full flex flex-col gap-6 lg:sticky lg:top-28">
+            
             {/* PROJE KÜNYESİ (BİLGİ KARTI) */}
-            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-3xl p-6 shadow-sm transition-colors duration-300">
+            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm transition-colors duration-300">
               <h3 className="font-['Oswald'] text-sm uppercase tracking-wider text-[var(--color-text-primary)] font-bold mb-4 flex items-center gap-2">
                 <Sparkles size={16} className="text-[#cc1616]" />
                 Proje Künyesi
@@ -213,81 +297,49 @@ export default function ProjectDetail() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pb-3 border-b border-[var(--color-border)]">
                   <span className="text-[var(--color-text-muted)] font-medium">Yürütücü Kurum</span>
-                  <span className="text-[var(--color-text-primary)] font-semibold">
+                  <span className="text-[var(--color-text-primary)] font-semibold flex items-center gap-1.5">
+                    <Building2 size={13} className="text-[#cc1616]" />
                     Kayseri TDB
                   </span>
                 </div>
-              </div>
-            </div>
-          </div>
 
-          {/* SAĞ SÜTUN: BAŞLIK, ROZETLER & DETAYLI AÇIKLAMA METNİ (lg:col-span-7) */}
-          <div className="lg:col-span-7 w-full flex flex-col">
-            
-            {/* ETİKETLER */}
-            <div className="flex flex-wrap items-center gap-2.5 mb-4">
-              <span className="inline-flex items-center gap-2 bg-[#cc1616]/10 border border-[#cc1616]/25 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase font-['Oswald'] text-[#cc1616]">
-                <span className="w-2 h-2 rounded-full bg-[#cc1616] animate-pulse" />
-                KTDB PROJESİ
-              </span>
-              <span
-                className="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-wider uppercase font-['Oswald']"
-                style={{ background: st.bg, border: `1px solid ${st.border}`, color: st.color }}
-              >
-                {st.label}
-              </span>
-            </div>
-
-            {/* PROJE BAŞLIĞI */}
-            <h1 className="font-['Oswald'] text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[var(--color-text-primary)] leading-[1.12] mb-6 break-words">
-              {project.title}
-            </h1>
-
-            {/* PROJE AÇIKLAMASI (EDİTÖRYAL İÇERİK KARTI) */}
-            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-3xl p-6 sm:p-10 shadow-lg transition-colors duration-300">
-              <div className="flex items-center gap-3 pb-5 mb-6 border-b border-[var(--color-border)]">
-                <span className="w-8 h-1 bg-[#cc1616] rounded-full" />
-                <h2 className="font-['Oswald'] text-lg uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
-                  Proje Kapsamı ve Raporu
-                </h2>
-              </div>
-
-              {/* METİN BÖLÜMÜ */}
-              <div className="prose prose-neutral max-w-none text-[var(--color-text-secondary)] leading-relaxed text-sm sm:text-base space-y-5 font-sans break-words">
-                {project.description ? (
-                  project.description.split("\n").map((p: string, i: number) =>
-                    p.trim() ? (
-                      <p key={i} className="text-justify sm:text-left leading-relaxed">
-                        {p}
-                      </p>
-                    ) : null
-                  )
-                ) : (
-                  <p className="text-[var(--color-text-muted)] italic">
-                    Bu proje hakkında detaylı açıklama metni henüz eklenmemiştir.
-                  </p>
-                )}
-              </div>
-
-              {/* DİPNOT / DAYANIŞMA METNİ */}
-              <div className="mt-8 pt-6 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--color-bg-elevated)]/40 rounded-2xl p-5">
-                <div>
-                  <p className="font-['Oswald'] text-sm uppercase tracking-wider text-[var(--color-text-primary)] font-bold">
-                    Turan Ülküsü İçin Çalışıyoruz
-                  </p>
-                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                    Projelerimize katılmak veya destek vermek için derneğimizle iletişime geçebilirsiniz.
-                  </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--color-text-muted)] font-medium">Faaliyet Alanı</span>
+                  <span className="text-[var(--color-text-primary)] font-semibold">
+                    Kültür & Sosyal Aksiyon
+                  </span>
                 </div>
-                <Link
-                  to="/#iletisim"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#cc1616] text-white text-xs font-['Oswald'] uppercase tracking-wider font-bold hover:bg-[#a81010] transition-colors shrink-0"
-                >
-                  İletişime Geç
-                </Link>
               </div>
+
+              {/* Paylaş Butonu */}
+              <button
+                onClick={handleShare}
+                className="w-full mt-5 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-text-primary)] hover:border-[#cc1616]/50 hover:text-[#cc1616] transition-all cursor-pointer"
+              >
+                {copied ? <Check size={14} className="text-emerald-500" /> : <Share2 size={14} />}
+                <span>{copied ? "Bağlantı Kopyalandı!" : "Bu Projeyi Paylaş"}</span>
+              </button>
+            </div>
+
+            {/* HIZLI KATILIM KARTI */}
+            <div className="bg-gradient-to-br from-[#cc1616]/15 via-[var(--color-bg-card)] to-[var(--color-bg-card)] border border-[#cc1616]/20 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm">
+              <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-[#cc1616] mb-2 font-['Oswald']">
+                PROJELERDE GÖREV ALIN
+              </span>
+              <h4 className="font-['Oswald'] text-lg font-bold uppercase text-[var(--color-text-primary)] mb-2">
+                Gönüllü Ekibimize Katılın
+              </h4>
+              <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mb-4">
+                Bu ve benzeri projelerimizde aktif görev alarak milli reflekse güç katabilirsiniz.
+              </p>
+              <Link
+                to="/#katil"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#cc1616] text-white text-xs font-['Oswald'] uppercase tracking-wider font-bold hover:bg-[#a81010] shadow-md shadow-[#cc1616]/25 transition-all"
+              >
+                Gönüllü Başvurusu Yap
+              </Link>
             </div>
 
           </div>
@@ -295,7 +347,7 @@ export default function ProjectDetail() {
 
         {/* DİĞER PROJELERİMİZ (ALT ÖNERİ ALANI) */}
         {otherProjects.length > 0 && (
-          <div className="mt-20 pt-12 border-t border-[var(--color-border)]">
+          <div className="mt-16 sm:mt-20 pt-10 sm:pt-12 border-t border-[var(--color-border)]">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <span className="text-[#cc1616] font-['Oswald'] text-xs font-bold uppercase tracking-widest">
@@ -323,7 +375,7 @@ export default function ProjectDetail() {
                   <Link
                     key={p.id}
                     to={`/proje/${p.id}`}
-                    className="group bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-[#cc1616]/50 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+                    className="group bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-[#cc1616]/50 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
                   >
                     <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-bg-elevated)]">
                       {pCover ? (
@@ -348,7 +400,7 @@ export default function ProjectDetail() {
 
                     <div className="p-5 flex-1 flex flex-col justify-between">
                       <div>
-                        <h4 className="font-['Oswald'] text-lg font-bold uppercase tracking-tight text-[var(--color-text-primary)] group-hover:text-[#cc1616] transition-colors line-clamp-2 mb-2">
+                        <h4 className="font-['Oswald'] text-base sm:text-lg font-bold uppercase tracking-tight text-[var(--color-text-primary)] group-hover:text-[#cc1616] transition-colors line-clamp-2 mb-2">
                           {p.title}
                         </h4>
                         <p className="text-xs text-[var(--color-text-muted)] line-clamp-2">

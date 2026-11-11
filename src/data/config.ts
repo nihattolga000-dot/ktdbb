@@ -24,8 +24,8 @@ export const siteConfig = {
 
 export const contactConfig = {
   address: 'Kayseri, Türkiye',
-  phone: 'Bilgi eklenecek',
-  email: 'kayseritdb@gmail.com ',
+  phone: '+90 507 887 63 66',
+  email: 'kayseritdb@gmail.com',
   workHours: 'Pazartesi – Cuma: 09:00 – 18:00',
 } as const;
 
