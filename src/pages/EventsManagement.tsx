@@ -87,6 +87,30 @@ export default function EventsManagement() {
     }
   };
 
+  // Türkiye saat dilimi (Europe/Istanbul) için datetime-local formatı (YYYY-MM-DDTHH:mm)
+  const formatForDateTimeInput = (dateStringOrDate: string | Date): string => {
+    const d = typeof dateStringOrDate === 'string' ? new Date(dateStringOrDate) : dateStringOrDate;
+    if (isNaN(d.getTime())) return '';
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Istanbul',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(d);
+    const getPart = (type: string) => parts.find((p) => p.type === type)?.value || '00';
+    const year = getPart('year');
+    const month = getPart('month');
+    const day = getPart('day');
+    let hour = getPart('hour');
+    if (hour === '24') hour = '00';
+    const minute = getPart('minute');
+    return `${year}-${month}-${day}T${hour}:${minute}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !description || !eventDate || !location) {
@@ -99,6 +123,16 @@ export default function EventsManagement() {
     try {
       const finalImageUrl = formatImageUrls(images);
 
+      // Türkiye saat dilimi (+03:00) ile normalize et, sunucu UTC'de çalışsa dahi saat kaymasını önle
+      const normalizedEventDate = (() => {
+        const trimmed = eventDate.trim();
+        if (trimmed.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(trimmed)) {
+          return trimmed;
+        }
+        const withSeconds = trimmed.length === 16 ? `${trimmed}:00` : trimmed;
+        return `${withSeconds}+03:00`;
+      })();
+
       const url = editingId ? `${API_BASE_URL}/api/events/${editingId}` : `${API_BASE_URL}/api/events`;
       const res = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
@@ -106,7 +140,7 @@ export default function EventsManagement() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ title, description, eventDate, location, imageUrl: finalImageUrl })
+        body: JSON.stringify({ title, description, eventDate: normalizedEventDate, location, imageUrl: finalImageUrl })
       });
 
       if (res.ok) {
@@ -127,11 +161,8 @@ export default function EventsManagement() {
     setEditingId(item.id);
     setTitle(item.title);
     setDescription(item.description);
-    // Format date for datetime-local input (YYYY-MM-DDThh:mm)
-    const d = new Date(item.eventDate);
-    const tzoffset = (new Date()).getTimezoneOffset() * 60000;
-    const localISOTime = (new Date(d.getTime() - tzoffset)).toISOString().slice(0, 16);
-    setEventDate(localISOTime);
+    // Format date for datetime-local input (YYYY-MM-DDThh:mm) in Europe/Istanbul timezone
+    setEventDate(formatForDateTimeInput(item.eventDate));
     setLocation(item.location);
     setImages(parseImageUrls(item.imageUrl));
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -162,7 +193,12 @@ export default function EventsManagement() {
 
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('tr-TR', {
-      day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Istanbul',
     }).format(new Date(dateString));
   };
 

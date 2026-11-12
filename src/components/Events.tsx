@@ -151,7 +151,7 @@ export default function Events() {
                         lineHeight: 1,
                       }}
                     >
-                      {evDate.getDate()}
+                      {new Intl.DateTimeFormat('tr-TR', { day: 'numeric', timeZone: 'Europe/Istanbul' }).format(evDate)}
                     </div>
                     <div
                       style={{
@@ -163,7 +163,7 @@ export default function Events() {
                         marginTop: '0.25rem',
                       }}
                     >
-                      {new Intl.DateTimeFormat('tr-TR', { month: 'short', year: 'numeric' }).format(evDate)}
+                      {new Intl.DateTimeFormat('tr-TR', { month: 'short', year: 'numeric', timeZone: 'Europe/Istanbul' }).format(evDate)}
                     </div>
                   </div>
 
@@ -241,7 +241,7 @@ export default function Events() {
                         }}
                       >
                         <Clock size={11} color="#cc1616" />
-                        {evDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                        {evDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' })}
                       </span>
                     </div>
                   </div>

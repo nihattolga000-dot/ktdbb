@@ -146,6 +146,7 @@ export default function EventDetail() {
         year: "numeric",
         month: "long",
         day: "numeric",
+        timeZone: "Europe/Istanbul",
       })
     : "Tarih Belirtilmedi";
 
@@ -153,6 +154,7 @@ export default function EventDetail() {
     ? evDate.toLocaleTimeString("tr-TR", {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: "Europe/Istanbul",
       })
     : "Saat Belirtilmedi";
 
@@ -466,6 +468,7 @@ export default function EventDetail() {
                 const otherDate = oDate ? new Date(oDate).toLocaleDateString("tr-TR", {
                   day: "numeric",
                   month: "short",
+                  timeZone: "Europe/Istanbul",
                 }) : "";
 
                 return (

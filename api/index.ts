@@ -417,11 +417,27 @@ router.post('/events/:id/register', async (req, res) => {
   }
 });
 
+// Türkiye saat dilimi (UTC+3 / Europe/Istanbul) desteği ile etkinlik tarihini çözümleme
+function parseEventDate(input: any): Date {
+  if (input instanceof Date) return input;
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    // Saat dilimsiz datetime-local formatı geldiyse (örn: "2026-11-14T19:30" veya "2026-11-14T19:30:00")
+    // Sunucu UTC'de çalışsa dahi yerel saat kaymasını önlemek için +03:00 eklenir
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(trimmed)) {
+      const normalized = trimmed.length === 16 ? `${trimmed}:00` : trimmed;
+      return new Date(`${normalized}+03:00`);
+    }
+    return new Date(trimmed);
+  }
+  return new Date();
+}
+
 router.post('/events', authenticate, requireEventComm, async (req, res) => {
   const { title, description, location, eventDate, imageUrl } = req.body;
   try {
     const event = await prisma.event.create({
-      data: { title, description, location, eventDate: new Date(eventDate), imageUrl },
+      data: { title, description, location, eventDate: parseEventDate(eventDate), imageUrl },
     });
     res.json(event);
   } catch (error) {
@@ -435,7 +451,7 @@ router.put('/events/:id', authenticate, requireEventComm, async (req, res) => {
   try {
     const event = await prisma.event.update({
       where: { id: req.params.id },
-      data: { title, description, location, eventDate: new Date(eventDate), ...(imageUrl && { imageUrl }) },
+      data: { title, description, location, eventDate: parseEventDate(eventDate), ...(imageUrl && { imageUrl }) },
     });
     res.json(event);
   } catch (error) {
