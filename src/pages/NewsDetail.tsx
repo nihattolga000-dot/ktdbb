@@ -193,7 +193,7 @@ export default function NewsDetail() {
             <ImageGalleryViewer
               images={images}
               title={news.title}
-              aspectRatio="16/10"
+              aspectRatio="auto"
               fallbackIcon={<Newspaper size={40} />}
             />
 

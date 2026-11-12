@@ -232,7 +232,7 @@ export default function ProjectDetail() {
             <ImageGalleryViewer
               images={images}
               title={project.title}
-              aspectRatio="16/10"
+              aspectRatio="auto"
               fallbackIcon={<FolderGit2 size={40} />}
             />
 

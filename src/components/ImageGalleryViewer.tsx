@@ -12,7 +12,7 @@ interface ImageGalleryViewerProps {
 export default function ImageGalleryViewer({
   images,
   title = '',
-  aspectRatio = '16/10',
+  aspectRatio = 'auto',
   fallbackIcon,
 }: ImageGalleryViewerProps) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -33,8 +33,8 @@ export default function ImageGalleryViewer({
   if (!images || images.length === 0) {
     return (
       <div
-        className="relative w-full rounded-3xl overflow-hidden flex flex-col items-center justify-center p-8 border border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-md transition-colors duration-300"
-        style={{ aspectRatio }}
+        className="relative w-full rounded-3xl overflow-hidden flex flex-col items-center justify-center p-8 border border-[var(--color-border)] bg-[var(--color-bg-card)] shadow-md transition-colors duration-300 min-h-[260px] sm:min-h-[320px]"
+        style={aspectRatio && aspectRatio !== 'auto' ? { aspectRatio } : undefined}
       >
         {/* Dekoratif hafif desen */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#cc1616]/5 via-transparent to-[#cc1616]/5 pointer-events-none" />
@@ -78,30 +78,39 @@ export default function ImageGalleryViewer({
         <div className="absolute -inset-1 bg-gradient-to-tr from-[#cc1616]/15 via-transparent to-transparent opacity-50 pointer-events-none" />
 
         <div
-          className="relative w-full cursor-pointer overflow-hidden flex items-center justify-center bg-black/5 min-h-[240px] xs:min-h-[280px] sm:min-h-[340px] md:min-h-[380px]"
-          style={{ aspectRatio: aspectRatio || '16/10' }}
+          className="relative w-full cursor-pointer overflow-hidden flex items-center justify-center bg-black/40 dark:bg-black/60 min-h-[260px] xs:min-h-[300px] sm:min-h-[380px] p-2 sm:p-4"
+          style={aspectRatio && aspectRatio !== 'auto' ? { aspectRatio } : undefined}
           onClick={() => !imgError && setLightboxOpen(true)}
         >
           {!imgError ? (
-            <img
-              key={currentImage}
-              src={currentImage}
-              alt={`${title} - Görsel ${activeIndex + 1}`}
-              onError={() => setImgError(true)}
-              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-              loading="eager"
-            />
+            <>
+              {/* Arka plan ambient blur (Görselin kenarlarında estetik, renk uyumlu derinlik) */}
+              <img
+                src={currentImage}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 dark:opacity-40 scale-110 pointer-events-none select-none"
+              />
+              <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+
+              {/* Ana Görsel (Asla kırpılmaz, tam boyut, afiş ve yatay/dikey her oran korunur) */}
+              <img
+                key={currentImage}
+                src={currentImage}
+                alt={`${title} - Görsel ${activeIndex + 1}`}
+                onError={() => setImgError(true)}
+                className="relative z-10 w-auto max-w-full h-auto max-h-[580px] sm:max-h-[680px] md:max-h-[760px] object-contain rounded-xl sm:rounded-2xl shadow-2xl transition-transform duration-300 ease-out group-hover:scale-[1.01]"
+                loading="eager"
+              />
+            </>
           ) : (
-            <div className="flex flex-col items-center justify-center p-6 text-center text-[var(--color-text-muted)]">
+            <div className="relative z-10 flex flex-col items-center justify-center p-6 text-center text-[var(--color-text-muted)]">
               <div className="w-12 h-12 rounded-2xl bg-[#cc1616]/10 text-[#cc1616] flex items-center justify-center mb-2">
                 {fallbackIcon || <ImageIcon size={28} />}
               </div>
               <p className="text-xs font-semibold">Görsel Yüklenemedi</p>
             </div>
           )}
-
-          {/* Alt hafif degrade - yazılar ve ikonlar için */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
 
           {/* Büyütme (Fullscreen) Rozeti */}
           <button
@@ -110,7 +119,7 @@ export default function ImageGalleryViewer({
               e.stopPropagation();
               setLightboxOpen(true);
             }}
-            className="absolute top-3 right-3 p-2.5 rounded-xl bg-black/60 hover:bg-[#cc1616] text-white/90 hover:text-white backdrop-blur-md border border-white/10 transition-all opacity-85 group-hover:opacity-100 shadow-lg active:scale-95"
+            className="absolute top-3 right-3 z-20 p-2.5 rounded-xl bg-black/60 hover:bg-[#cc1616] text-white/90 hover:text-white backdrop-blur-md border border-white/10 transition-all opacity-85 group-hover:opacity-100 shadow-lg active:scale-95"
             title="Tam Ekran Görüntüle"
           >
             <Maximize2 size={16} />
@@ -118,7 +127,7 @@ export default function ImageGalleryViewer({
 
           {/* Sayfa / Adet Sayacı */}
           {images.length > 1 && (
-            <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-bold text-white/90 tracking-wider">
+            <div className="absolute top-3 left-3 z-20 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-bold text-white/90 tracking-wider">
               {activeIndex + 1} / {images.length}
             </div>
           )}
@@ -129,7 +138,7 @@ export default function ImageGalleryViewer({
               <button
                 type="button"
                 onClick={handlePrev}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-[#cc1616] text-white border border-white/10 backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 shadow-xl active:scale-95"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-black/60 hover:bg-[#cc1616] text-white border border-white/10 backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 shadow-xl active:scale-95"
                 aria-label="Önceki Görsel"
               >
                 <ChevronLeft size={18} />
@@ -137,7 +146,7 @@ export default function ImageGalleryViewer({
               <button
                 type="button"
                 onClick={handleNext}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-[#cc1616] text-white border border-white/10 backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 shadow-xl active:scale-95"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-black/60 hover:bg-[#cc1616] text-white border border-white/10 backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110 shadow-xl active:scale-95"
                 aria-label="Sonraki Görsel"
               >
                 <ChevronRight size={18} />

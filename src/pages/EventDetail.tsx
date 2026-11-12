@@ -296,7 +296,7 @@ export default function EventDetail() {
             <ImageGalleryViewer
               images={images}
               title={event.title}
-              aspectRatio="16/10"
+              aspectRatio="auto"
               fallbackIcon={<CalendarCheck size={40} />}
             />
 
