@@ -24,9 +24,10 @@ export const siteConfig = {
 
 export const contactConfig = {
   address: 'Kayseri, Türkiye',
+  phone: '' as string,
   email: 'kayseritdb@gmail.com',
   workHours: 'Pazartesi – Cuma: 09:00 – 18:00',
-} as const;
+};
 
 export const socialConfig = {
   instagram: 'https://www.instagram.com/tdb.kayserii/',

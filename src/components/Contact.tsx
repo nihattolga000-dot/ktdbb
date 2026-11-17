@@ -165,7 +165,7 @@ export default function Contact() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {[
               { icon: MapPin, title: 'Merkez Yerleşke', desc: contactConfig.address },
-              { icon: Phone, title: 'İletişim Hattı', desc: contactConfig.phone },
+              ...(contactConfig.phone ? [{ icon: Phone, title: 'İletişim Hattı', desc: contactConfig.phone }] : []),
               { icon: Mail, title: 'E-Posta', desc: contactConfig.email },
             ].map(({ icon: Icon, title, desc }) => (
               <div

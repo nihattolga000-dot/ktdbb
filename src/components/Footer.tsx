@@ -30,7 +30,7 @@ const footerLinks = {
   ],
   iletisim: [
     { label: contactConfig.email, href: `mailto:${contactConfig.email}` },
-    { label: contactConfig.phone, href: '#' },
+    ...(contactConfig.phone ? [{ label: contactConfig.phone, href: '#' }] : []),
     { label: contactConfig.address, href: '#' },
   ],
 };
